@@ -2,7 +2,7 @@
 
 > 日常碎碎念、Diary 日记、聊天灵感、知识库和项目，最后成为一个属于自己的 Markdown 数字生活空间。
 
-**当前状态：v0.4 验收增强版 · Astro + Obsidian · 本仓库暂时为 Public。**
+**当前状态：v0.5 私人部署与双向同步验收版 · Astro + Obsidian · 本仓库暂时为 Public。**
 
 ⚠️ **请勿上传真实私人日记、聊天记录、照片、身份证件、账户或其他敏感数据。** 已设置 Git 忽略规则，但不是泄露保险：强制添加、已经提交的历史、工作流日志和第三方部署都可能泄露内容。详见 [隐私指南](docs/PRIVACY.md)。
 
@@ -107,6 +107,29 @@ npm run photos:import -- --file /path/photo.jpg --title "某天的照片"
 
 **重要：** 上述代码和命令不会自动连接你的 ChatGPT 历史、Memos 账号或云端相册，也不会自动发布私人网页。所有外部来源和真人记录均需要用户自行授权或明确选择。
 
+## v0.5：私人同步 / Caddy 安全测试 / 独立备份
+
+公开 GitHub 仓库仍然**只保存代码和演示内容**。真实 Diary/Photos/Chat-Captures 只留在 Git 忽略的 Vault 中。
+
+1. **[Windows + 手机 Obsidian 同步](docs/SYNC-SETUP.md)**：Obsidian Sync E2EE 优先（需订阅），可用 sync:probe 做 PC → 手机 → PC 双向确认。
+2. **[加密备份与恢复演练](docs/BACKUP.md)**：独立 restic 仓库，不能把 Git 或跨设备同步当备份。
+3. **[私有部署与 Caddy/Tailscale 验收](docs/PRIVATE-DEPLOY.md)**：先用 Public 演示内容启动只监听本机的 Caddy，匿名访问必须返回 401，检查通过后才构建私人网站。
+4. GitHub Actions 使用**合成账户/密码**启动真实 Caddy 容器做认证回归测试。不会上传私人 Vault。
+
+~~~powershell
+npm run sync:probe -- create
+npm run sync:probe -- verify <16位ID>
+
+# 先用演示数据启动 Caddy 并配置本地 hash，详见文档
+npm run private:preflight
+npm run private:check-auth
+
+# 只有通过认证测试后才可执行
+npm run private:build
+~~~
+
+手机 HTTPS Tailscale Serve 和 Obsidian Sync 实机登录仍需在自己的设备配置，并不由 GitHub CI 自动完成。
+
 ## 构建
 
 ~~~bash
@@ -127,6 +150,8 @@ npm run preview
 - [Memos 导入](docs/MEMOS.md)
 - [相册](docs/PHOTOS.md)
 - [私人网页认证部署](docs/PRIVATE-DEPLOY.md)
+- [Windows / 手机 Vault 同步指南](docs/SYNC-SETUP.md)
+- [加密备份与恢复](docs/BACKUP.md)
 - [手机快捷记录](docs/MOBILE-CAPTURE.md)
 - [AI 协作规则](AGENTS.md)
 

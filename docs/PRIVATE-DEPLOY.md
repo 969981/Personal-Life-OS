@@ -1,85 +1,117 @@
-# 私人网页部署（有认证的本机 / Tailscale）
+# Personal Life OS 私人网站：Caddy + Tailscale Serve
 
-**当前公开仓库只可以部署演示数据。** 正式日记网站必须先将仓库设为 Private，或保留私人 vault 完全本地；同时完成身份认证。不能仅用 noindex 或 GitHub Private 保证静态网页权限。
+> 当前代码仓库 Public，真实 Vault 只保存在本地并被 Git 忽略。任何含私人数据的站点构建都不得上传 GitHub Actions、Pages、Vercel、Cloudflare Pages 的公开预览或第三方托管。
 
-本方案选用 **Astro 静态构建 + Caddy 全站 Basic Auth + 仅绑定 127.0.0.1 + Tailscale Serve**。默认不需要公网域名，不依赖外部反向代理。Caddy 只监听容器内部 HTTP 端口，本机回环口才可访问；远程通过 Tailscale HTTPS 访问，并额外经过 Caddy 密码验证。
+## 安全模型
 
-## 1. 准备
+Astro 生成静态 HTML → Caddy 全站 HTTP Basic Auth → Docker 仅监听 127.0.0.1:8088 → Tailscale Serve 的 tailnet HTTPS → 用户本人手机访问。
 
-确保 Node.js 22、Docker Engine/Docker Desktop 和 Tailscale 已安装。先用 Obsidian/CLI 建立本地笔记和照片。
+Caddy Basic Auth 对根目录、HTML、图片、Search、Wiki、嵌入和 Capture 页面均生效。**Basic Auth 本身在明文 HTTP 上不安全**，因此 8088 仅允许在同一电脑的回环地址访问，手机必须使用 Tailscale 提供的 HTTPS，不得直接把 8088 开放公网。
 
-```powershell
+## 第一步：确保 Vault 同步/备份完成
+
+先完成 [SYNC-SETUP.md](SYNC-SETUP.md) 的双向测试与 [BACKUP.md](BACKUP.md) 的备份恢复演练。不要为了部署先上传真实隐私文件到 Public GitHub。
+
+## 第二步：先用公开演示数据启动 Caddy
+
+需要 Node.js 22、Docker Desktop、Tailscale；在 Windows PowerShell 进入仓库：
+
+~~~powershell
 npm install --prefix apps/web
-```
-
-普通公开演示构建：
-
-```powershell
 npm run build
-```
 
-如果确实要生成包含私人内容的静态网站，先确认只打算把生成目录挂到受保护的 Caddy 实例：
-
-```powershell
-$env:LIFE_OS_PRIVATE_BUILD = "I_HAVE_PROTECTED_THE_SITE"
-npm run build
-Remove-Item Env:LIFE_OS_PRIVATE_BUILD
-```
-
-此命令只选择需要打包的数据，**本身不提供任何访问认证**。在确认 Caddy 配置正确以前，不要把 dist 拷贝到公开托管服务。
-
-## 2. 配置 Caddy 密码
-
-复制 `deploy/private.env.example` 到 `deploy/.private.env`（已被 Git 忽略）。先使用 Caddy 的 `hash-password` 命令生成 bcrypt 哈希，例如使用 Docker 的交互命令：
-
-```bash
+Copy-Item deploy\private.env.example deploy\.private.env
 docker run --rm -it caddy:2.10 caddy hash-password
-```
+~~~
 
-请在交互提示中输入强密码，不要将明文密码写进仓库、终端命令参数或 CI 环境。将生成的哈希填入 LIFE_OS_BASIC_HASH；保留 env 文件中**单引号**以避免美元符号被 Compose 扩展。
+在交互提示中输入强密码，复制生成的 bcrypt 哈希，编辑只保存在本地的 deploy/.private.env：
 
-接着启动：
+~~~dotenv
+LIFE_OS_BASIC_USER=my-private-user
+LIFE_OS_BASIC_HASH='$2a$14$替换为真实bcrypt哈希'
+~~~
 
-```bash
+hash 里的美元符号用**单引号**包住。不要把真实明文密码、hash 或 deploy/.private.env 上传到 Git。请不要在 PowerShell 历史中输入带有明文密码的命令。
+
+~~~powershell
+npm run private:preflight
 docker compose -f deploy/compose.private.yml up -d
-```
+~~~
 
-## 3. 必须进行认证测试
+Caddy 仅绑定 http://127.0.0.1:8088 ，不会监听公网网卡。第一次 Docker 启动可能需要拉取 caddy 镜像。
 
-```bash
-curl -I http://127.0.0.1:8088/
-curl -I http://127.0.0.1:8088/_gallery/example.webp
-```
+## 第三步：自动验证全站认证
 
-两条未带认证的请求应返回 **401**。即使照片不存在，也要先经过认证（401），而不是直接 404 或 200。认证成功后才允许返回 HTML 和图片。无法通过时立即停止容器，不要发布。
+在当前 PowerShell 窗口获取登录凭据，密码只放在临时进程环境变量中：
 
-浏览器可以直接访问 http://127.0.0.1:8088；由于 Basic Auth 不应在公网明文 HTTP 上使用，这个地址只允许访问本机 loopback。
+~~~powershell
+$cred = Get-Credential -Message "输入刚设置的 Caddy 账户与密码"
+$env:LIFE_OS_TEST_USER = $cred.UserName
+$env:LIFE_OS_TEST_PASSWORD = $cred.GetNetworkCredential().Password
+npm run private:check-auth
+~~~
 
-## 4. 用 Tailscale Serve 在自己设备上远程访问
+脚本检查每个路径的匿名 GET / HEAD 均返回 401，错误账号仍返回 401，正确账号访问正常页面返回 200，同时检查 no-store 缓存头。包括不存在的图片路径：必须先触发认证，再给 404。
 
-所有设备登录同一个 Tailscale tailnet，在运行私有网站的那台主机执行：
+**认证失败立即停止：**
 
-```bash
-tailscale serve 8088
-```
+~~~powershell
+docker compose -f deploy/compose.private.yml down
+~~~
 
-按提示启用 tailnet HTTPS。使用其产生的 `*.ts.net` 站点地址访问，并输入 Caddy 账户密码。**不要开启 Tailscale Funnel**；Serve 只分享给 tailnet 成员，Funnel 会公开到互联网。还要确认 tailnet 的 ACL/grants 只允许你的个人账户或设备访问。
+## 第四步：只有认证通过后才能构建私人网站
 
-参见：https://tailscale.com/docs/features/tailscale-serve
+~~~powershell
+npm run private:build
+~~~
 
-## 5. 其他部署选项
+此命令会先重复静态安全检查和真实 HTTP 认证测试，然后仅在当前本机进程里开启 LIFE_OS_PRIVATE_BUILD，构建私人 HTML 和已授权的图片列表，最后再次检测认证。如果发生故障将尝试关闭 Docker 服务。
 
-Cloudflare Pages + Access 是另一条路线，但须手工完成 Access 应用、正式域名、*.pages.dev 和所有预览域名的权限覆盖检查，确认匿名用户无法直接读取资源，然后才构建私有版本。**本仓库不会自动向 Cloudflare Pages、GitHub Pages 或 Vercel 上传任何私人内容。**
+⚠️ 本机构建产物 apps/web/dist/ 含有真实私人信息，虽然不上传 Git，但在磁盘上是**明文 HTML 文件**。请使用 Windows 设备加密/BitLocker，禁止任何公开静态服务读取此目录。
 
-## 6. 验收
+## 第五步：将本机网站通过 Tailscale Serve 提供给手机
 
-- 未登录的网页 HTML、照片 URL、搜索索引、资源路由全部被拒绝；
-- Docker 端口只绑定 127.0.0.1；
-- Tailscale Serve 可访问，Funnel 不可访问；
-- 私人 Build 不被任何 Public CI、预览分支或自动发布作业上传；
-- 更新网站时会重新构建并检查静态目录，无多余旧照片；
-- 备份独立于 Git 历史，并定期恢复测试。
+在 Windows **管理员 PowerShell** 中执行（确认 Tailscale 已在本机登录）：
 
-参考：
+~~~powershell
+tailscale serve --bg 8088
+tailscale serve status
+~~~
+
+Tailscale 会显示本 tailnet 的 HTTPS 地址（通常是设备域名 .ts.net）。不要使用 tailscale funnel，也不要在路由器端口转发、Docker 0.0.0.0 绑定或关闭 Caddy 登录。访问控制应只允许自己的手机与电脑，检查 tailnet ACL/grants。
+
+将手机登录同一 Tailscale tailnet，在手机浏览器打开 Serve 展示的 HTTPS 地址，必须仍需 Caddy 密码。登录后先用演示数据检查日记、相册、嵌入、搜索和离线 Capture。
+
+可选从 Windows 对 tailnet HTTPS 地址复测：
+
+~~~powershell
+node scripts/check-auth.mjs --base "https://你的设备域名.ts.net/" --allow-tailnet
+~~~
+
+（仍使用上一步的 LIFE_OS_TEST_USER 和 LIFE_OS_TEST_PASSWORD。）
+
+**未登录的直接访问必须是 401**。若在手机上看到无需密码即可读取真实私人 HTML/图片，立即执行 tailscale serve off 和 docker compose down。
+
+## 第六步：结束后清除临时口令环境变量
+
+~~~powershell
+Remove-Item Env:LIFE_OS_TEST_USER
+Remove-Item Env:LIFE_OS_TEST_PASSWORD
+Remove-Variable cred
+~~~
+
+## 停止服务
+
+~~~powershell
+tailscale serve off
+docker compose -f deploy/compose.private.yml down
+~~~
+
+## 验收范围
+
+GitHub Actions 仅使用合成口令与公开演示页面测试真实 Caddy 401/200 和回环端口。CI 成功不代表用户的手机、Tailscale 帐户或 Windows Docker 已经配置完成。只有在你的设备上完成上述步骤，才可宣称私人站点真正上线。
+
+文档：
 - https://caddyserver.com/docs/caddyfile/directives/basic_auth
 - https://tailscale.com/docs/features/tailscale-serve
+- https://tailscale.com/docs/reference/examples/serve

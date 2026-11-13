@@ -34,3 +34,8 @@ apps/web/public/_gallery/
 # Never accidentally publish local authorization information
 deploy/.private.env
 deploy/secrets.env
+
+# Vault handshakes and non-repo backups: never push to the public code repository
+vault/Sync-Probes/
+backups/
+deploy/.private.env.backup
