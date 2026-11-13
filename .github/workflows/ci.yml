@@ -60,10 +60,10 @@ jobs:
             echo "ERROR: private content leaked into the public build"
             exit 1
           fi
-          if find apps/web/dist/_gallery -type f | grep -q .; then
+          if [ -d apps/web/dist/_gallery ] && find apps/web/dist/_gallery -type f | grep -q .; then
             echo "ERROR: public build unexpectedly includes photo files."
             exit 1
           fi
           grep -q '今天想试试把碎碎念变成能长久保存' apps/web/dist/moments/index.html
-          grep -q '哪些笔记链接到这里' apps/web/dist/notes/Samples/knowledge-demo/index.html
+          grep -q '哪些笔记链接到这里' apps/web/dist/notes/samples/knowledge-demo/index.html
           echo "Public build verified Diary Timeline, backlinks and privacy canary."
