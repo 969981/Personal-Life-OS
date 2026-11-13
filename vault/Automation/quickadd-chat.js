@@ -37,5 +37,6 @@ module.exports = async ({ app, quickAddApi }) => {
     '',
   ].join('\n');
   await app.vault.create(path, document);
+  const { Notice } = require('obsidian');
   new Notice('已保存私人聊天摘录：' + path);
 };

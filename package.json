@@ -2,11 +2,17 @@
   "name": "personal-life-os",
   "private": true,
   "scripts": {
-    "dev": "npm --prefix apps/web run dev",
-    "build": "npm --prefix apps/web run build",
+    "dev": "node scripts/prepare-photos.mjs && npm --prefix apps/web run dev",
+    "build": "node scripts/prepare-photos.mjs && npm --prefix apps/web run build",
     "preview": "npm --prefix apps/web run preview",
     "init:vault": "node scripts/init-vault.mjs",
     "capture": "node scripts/capture.mjs",
-    "test": "node --test scripts/*.test.mjs"
+    "test": "node --test scripts/*.test.mjs",
+    "dev:private": "node scripts/private-dev.mjs",
+    "photos:import": "node apps/web/scripts/import-photo.mjs",
+    "ai:organize": "node scripts/ai-organize.mjs",
+    "ai:approve": "node scripts/approve-proposal.mjs",
+    "memos:import": "node scripts/import-memos.mjs",
+    "test:photos": "node --test apps/web/scripts/*.test.mjs"
   }
 }
