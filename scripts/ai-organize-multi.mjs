@@ -56,6 +56,10 @@ const vault=resolve(process.env.LIFE_OS_VAULT_DIR??fileURLToPath(new URL('../vau
 const folder=join(vault,'00-Inbox','AI-Proposals');
 await mkdir(folder,{recursive:true});
 const yaml=(value)=>JSON.stringify(String(value).replaceAll('\r',' ').replaceAll('\n',' '));
+// Markdown escaping prevents generated summaries from creating raw HTML or remote image requests.
+const plain=(value)=>String(value)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/([\\\x60*_{}\[\]()#+\-.!|])/g,'\\$1');
 let saved=0,duplicates=0,rejected=0;
 const seen=new Set();
 for(const item of data.items.slice(0,maximum)){
@@ -75,11 +79,11 @@ for(const item of data.items.slice(0,maximum)){
     'visibility: private','status: pending-review',
     'source_hash: '+yaml(digest),'source_file: '+yaml(source),
     'source_evidence: '+yaml(evidence),'tags: '+JSON.stringify(tags),
-    '---','','# '+title.replace(/\r?\n/g,' '),'',
+    '---','','# '+plain(title.replace(/\r?\n/g,' ')),'',
     '> AI 候选内容：并非已验证事实。需人工审核通过后才进入知识库。','',
-    '## 摘要','',summary,'','## 原文依据','', '> '+evidence.replace(/\r?\n/g,' '),'',
+    '## 摘要','',plain(summary),'','## 原文依据','', '> '+plain(evidence.replace(/\r?\n/g,' ')),'',
     '## 下一步','',
-    ...(actions.length?actions.map(a=>'- [ ] '+a):['- [ ] 人工确认和补充']),
+    ...(actions.length?actions.map(a=>'- [ ] '+plain(a)):['- [ ] 人工确认和补充']),
     '','## 来源校验','',
     '- 来源 SHA-256：'+digest,
     '- 只保留引用，不会修改或覆盖原文','',''

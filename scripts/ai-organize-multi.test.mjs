@@ -31,7 +31,7 @@ test('One input yields multiple independently reviewable notes; invalid evidence
     assert.match(JSON.parse(request).system,/不可信|未经信任/);
     res.writeHead(200,{'content-type':'application/json'});
     res.end(JSON.stringify({response:JSON.stringify({items:[
-      {title:'摄影相册自动分组',category:'project',summary:'按日期整理相册',
+      {title:'摄影相册自动分组',category:'project',summary:'按日期整理相册<script>alert(1)</script> ![](https://tracking.example/img)',
        evidence:'我想把摄影相册自动按日期分组',tags:['摄影'],actions:['做一个日期筛选器']},
       {title:'随手灵感',category:'idea',summary:'捕捉日常想法',
        evidence:'希望能记录每天随手想到的一个点子',tags:['灵感'],actions:['设置快捷键']},
@@ -55,6 +55,8 @@ test('One input yields multiple independently reviewable notes; invalid evidence
     const file=await readFile(join(draftDir,name),'utf8');
     assert.match(file,/visibility: private/);
     assert.match(file,/source_evidence:/);
+    assert.doesNotMatch(file,/<script>/);
+    assert.doesNotMatch(file,/!\[\]\(https:/);
     assert.match(file,/status: pending-review/);
     const type=file.match(/^type: (.+)$/m)[1];
     const target=type==='idea'?'Ideas':'Projects';
