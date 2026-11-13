@@ -13,7 +13,6 @@
 ~~~bash
 git clone https://github.com/969981/Personal-Life-OS.git
 cd Personal-Life-OS
-git switch feat/personal-life-os-foundation
 npm run init:vault
 npm install --prefix apps/web
 npm run dev
