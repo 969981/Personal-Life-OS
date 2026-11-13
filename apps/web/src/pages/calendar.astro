@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { visibleNotes, sectionNotes, noteDate, noteHref } from '../lib/notes';
+const notes = sectionNotes(await visibleNotes(), 'diary');
+const values = notes.map((note) => ({
+  date: noteDate(note).toISOString().slice(0,10),
+  title: note.data.title,
+  href: noteHref(note),
+}));
+const initial = values.length ? values[0].date.slice(0,7) : new Date().toISOString().slice(0,7);
+---
+<BaseLayout title="日历" active="calendar">
+  <p class="page-eyebrow">LIFE IN DAYS / CALENDAR</p>
+  <h1 class="page-title">生活，有迹可循。</h1>
+  <p class="page-description">点击有记录的日期，回看那一天写下的故事。日历只展示当前网站允许读取的 Diary 内容。</p>
+  <div id="calendar-app" data-entries={JSON.stringify(values)} data-month={initial}>
+    <div class="calendar-tools">
+      <h2 id="calendar-month">{initial}</h2>
+      <div class="calendar-buttons"><button id="month-prev" class="icon-button" type="button" aria-label="上个月">‹</button><button id="month-next" class="icon-button" type="button" aria-label="下个月">›</button></div>
+    </div>
+    <div class="calendar" id="calendar-grid" aria-label="日记月历">
+      {['一','二','三','四','五','六','日'].map((day) => <div class="calendar-weekday">{day}</div>)}
+    </div>
+  </div>
+  <div class="mini-panel" style="margin-top:22px">
+    <h2 class="panel-heading">✦ 让日子有点痕迹</h2>
+    <p class="page-description" style="margin:0">一天没有任何记录也没关系。这里不是打卡任务，更不是生产力指标，只是一份回忆地图。</p>
+  </div>
+  <script>
+    type Entry = { date: string; title: string; href: string };
+    const root = document.querySelector<HTMLElement>('#calendar-app');
+    const grid = document.querySelector<HTMLElement>('#calendar-grid');
+    const label = document.querySelector<HTMLElement>('#calendar-month');
+    const entries: Entry[] = root?.dataset.entries ? JSON.parse(root.dataset.entries) : [];
+    const byDay = new Map<string,Entry[]>();
+    entries.forEach((entry) => byDay.set(entry.date, [...(byDay.get(entry.date) ?? []),entry]));
+    const parts = (root?.dataset.month ?? '2026-11').split('-').map(Number);
+    let year = parts[0], month = parts[1] - 1;
+    function renderMonth() {
+      if (!grid || !label) return;
+      grid.querySelectorAll('.calendar-day').forEach((node) => node.remove());
+      label.textContent = year + ' 年 ' + (month + 1) + ' 月';
+      const offset = (new Date(Date.UTC(year,month,1)).getUTCDay() + 6) % 7;
+      const days = new Date(Date.UTC(year,month+1,0)).getUTCDate();
+      const total = Math.ceil((offset + days)/7)*7;
+      for(let cell=0; cell<total; cell++) {
+        const day = cell - offset + 1;
+        const date = new Date(Date.UTC(year,month,day));
+        const key = date.toISOString().slice(0,10);
+        const matches = byDay.get(key) ?? [];
+        const node = document.createElement('div');
+        node.className = 'calendar-day' + (day < 1 || day > days ? ' other-month' : '') + (matches.length ? ' has-entry' : '');
+        const dayNumber = document.createElement('span');
+        dayNumber.textContent = String(date.getUTCDate());
+        node.append(dayNumber);
+        matches.slice(0,2).forEach((entry) => {
+          const link = document.createElement('a');
+          link.href = entry.href;
+          link.textContent = '✦ ' + entry.title;
+          node.append(link);
+        });
+        grid.append(node);
+      }
+    }
+    document.querySelector('#month-prev')?.addEventListener('click', () => {
+      month--; if(month<0) {month=11;year--;} renderMonth();
+    });
+    document.querySelector('#month-next')?.addEventListener('click', () => {
+      month++; if(month>11) {month=0;year++;} renderMonth();
+    });
+    renderMonth();
+  </script>
+</BaseLayout>

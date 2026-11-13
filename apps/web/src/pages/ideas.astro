@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { visibleNotes, sectionNotes } from '../lib/notes';
+const entries = sectionNotes(await visibleNotes(), 'idea');
+---
+<BaseLayout title="灵感" active="ideas">
+  <p class="page-eyebrow">IDEA GARDEN / NOTES TO GROW</p>
+  <h1 class="page-title">让灵感，慢慢发芽。</h1>
+  <p class="page-description">聊天时想到的功能、生活里突然冒出的点子，都可以先放进收件箱，再慢慢整理成可执行的想法。</p>
+  {entries.length ? <div class="page-card-list">{entries.map((note) => <NoteCard note={note}/>)}</div> :
+  <div class="empty"><strong>等待第一颗种子</strong>在 Obsidian 的 Ideas/ 中创建灵感文件，或使用模板快速记录。</div>}
+</BaseLayout>

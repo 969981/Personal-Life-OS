@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { visibleNotes, sectionNotes } from '../lib/notes';
+const entries = sectionNotes(await visibleNotes(), 'diary');
+---
+<BaseLayout title="日记" active="diary">
+  <p class="page-eyebrow">MY DAILY STORIES / DIARY</p>
+  <h1 class="page-title">每一天，都值得记下。</h1>
+  <p class="page-description">不需要写得多完整。一句话、一段经历，或者一张照片，都是属于那一天的小小记忆。</p>
+  {entries.length ? <div class="page-card-list">{entries.map((note) => <NoteCard note={note}/>)}</div> :
+  <div class="empty"><strong>还没有日记</strong>打开 Obsidian，在 Diary 目录创建一篇日记。私有笔记不会出现在默认公开构建中。</div>}
+</BaseLayout>

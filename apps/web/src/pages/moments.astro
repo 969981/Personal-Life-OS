@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { visibleNotes, sectionNotes, dateText, noteDate, noteHref } from '../lib/notes';
+const entries = sectionNotes(await visibleNotes(), 'moment');
+---
+<BaseLayout title="碎碎念" active="moments">
+  <p class="page-eyebrow">THOUGHT FRAGMENTS / MOMENTS</p>
+  <h1 class="page-title">脑袋里的小宇宙。</h1>
+  <p class="page-description">一句话、一张照片、一个突然的念头。无需分类，不必精致，按时间串起来就很好。</p>
+  {entries.length ? <section class="timeline">
+    {entries.map((note) => <article class="timeline-item">
+      <time>{dateText(noteDate(note))}</time>
+      <h2>{note.data.title}</h2>
+      <p>{note.data.summary ?? '一段留给未来的碎碎念。'}</p>
+      <a class="inline-link" href={noteHref(note)}>阅读全文 ↗</a>
+    </article>)}
+  </section> : <div class="empty"><strong>时间线还空着</strong>随手记录的碎片，会慢慢在这里汇集。</div>}
+</BaseLayout>

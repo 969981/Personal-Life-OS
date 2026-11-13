@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { visibleNotes, sectionNotes } from '../lib/notes';
+const entries = sectionNotes(await visibleNotes(), 'knowledge');
+---
+<BaseLayout title="知识库" active="knowledge">
+  <p class="page-eyebrow">SECOND BRAIN / KNOWLEDGE</p>
+  <h1 class="page-title">写给未来的自己。</h1>
+  <p class="page-description">知识笔记不追求数量，重在出处、验证和联系。Markdown 是内容的归宿，而不是某个软件的专有数据库。</p>
+  {entries.length ? <div class="page-card-list">{entries.map((note) => <NoteCard note={note}/>)}</div> :
+  <div class="empty"><strong>暂无知识卡片</strong>用 Obsidian 创建一篇 type: knowledge 的笔记即可。</div>}
+</BaseLayout>

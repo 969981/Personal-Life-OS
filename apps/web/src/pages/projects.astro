@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { visibleNotes, sectionNotes } from '../lib/notes';
+const entries = sectionNotes(await visibleNotes(), 'project');
+---
+<BaseLayout title="项目" active="projects">
+  <p class="page-eyebrow">WORK IN PROGRESS / PROJECTS</p>
+  <h1 class="page-title">每一个正在进行的计划。</h1>
+  <p class="page-description">记录为什么开始、现在做到哪一步、还有哪些未完成的事情。即使暂停，也有迹可循。</p>
+  {entries.length ? <div class="page-card-list">{entries.map((note) => <NoteCard note={note}/>)}</div> :
+  <div class="empty"><strong>暂无项目</strong>创建带有 type: project 的 Markdown 笔记即可加入这个列表。</div>}
+</BaseLayout>
