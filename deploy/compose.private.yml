@@ -1,0 +1,19 @@
+services:
+  life-os-private:
+    image: caddy:2.10
+    container_name: personal-life-os-private
+    restart: unless-stopped
+    env_file:
+      - .private.env
+    ports:
+      - "127.0.0.1:8088:80"
+    volumes:
+      - ../apps/web/dist:/srv:ro
+      - ./Caddyfile.private:/etc/caddy/Caddyfile:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /data
+      - /config
+    security_opt:
+      - no-new-privileges:true
