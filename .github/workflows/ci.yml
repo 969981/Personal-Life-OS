@@ -56,6 +56,7 @@ jobs:
           test -f apps/web/dist/search/index.html
           test -f apps/web/dist/capture/index.html
           test -f apps/web/dist/moments/index.html
+          test -f apps/web/dist/wiki/samples/knowledge-demo/index.html
           if grep -R -q 'SECRET_PRIVATE_CONTENT_MUST_NOT_APPEAR\|CI PRIVATE CANARY' apps/web/dist; then
             echo "ERROR: private content leaked into the public build"
             exit 1
