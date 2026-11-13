@@ -41,3 +41,12 @@
 - Public builds may only copy images with explicit visibility: public through scripts/prepare-photos.mjs.
 - The private Caddy deployment must listen on 127.0.0.1 and block unauthenticated access to HTML and image URLs.
 - Never imply that a local Docker/Tailscale config is already deployed or authenticated without real device tests.
+
+## v0.3: Daily capture and linking
+
+- Diary Timeline entries are derived from the original daily note and must not be duplicated into Moments/.
+- Only extract time-stamped Markdown list items in ## Timeline, never code, unrelated sections, or task checkboxes.
+- WikiLinks and incoming backlinks resolve against visibility-filtered notes. Do not reveal hidden/private note metadata via a public route.
+- Note transclusions are navigable references; never embed hidden note HTML through an unverified include.
+- The static /capture page must never submit raw content to a web API, service worker, query parameter or analytics; only a direct user interaction may open official Obsidian URI.
+- AI multi extraction must require exact quoted source evidence and manual human approval.

@@ -2,7 +2,7 @@ name: CI (public samples only)
 
 on:
   push:
-    branches: [main, feat/personal-life-os-foundation, feat/capture-ai-memos-photos-private-deploy]
+    branches: [main, feat/personal-life-os-foundation, feat/capture-ai-memos-photos-private-deploy, feat/diary-timeline-wikilinks-ai-mobile]
   pull_request:
   workflow_dispatch:
 
@@ -29,6 +29,8 @@ jobs:
           fi
       - name: Test local capture command
         run: npm test
+      - name: Test WikiLink indexes and Diary Timeline parsing
+        run: npm run test:knowledge
       - name: Create private canary (must be filtered from public output)
         run: |
           cat > vault/Samples/ci-private-canary.md <<'EOF'
@@ -52,6 +54,8 @@ jobs:
           test -f apps/web/dist/diary/index.html
           test -f apps/web/dist/calendar/index.html
           test -f apps/web/dist/search/index.html
+          test -f apps/web/dist/capture/index.html
+          test -f apps/web/dist/moments/index.html
           if grep -R -q 'SECRET_PRIVATE_CONTENT_MUST_NOT_APPEAR\|CI PRIVATE CANARY' apps/web/dist; then
             echo "ERROR: private content leaked into the public build"
             exit 1
@@ -60,4 +64,6 @@ jobs:
             echo "ERROR: public build unexpectedly includes photo files."
             exit 1
           fi
-          echo "Public demo build generated without private canary or photos."
+          grep -q '今天想试试把碎碎念变成能长久保存' apps/web/dist/moments/index.html
+          grep -q '哪些笔记链接到这里' apps/web/dist/notes/Samples/knowledge-demo/index.html
+          echo "Public build verified Diary Timeline, backlinks and privacy canary."

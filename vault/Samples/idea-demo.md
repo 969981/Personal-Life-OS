@@ -18,3 +18,9 @@ status: exploring
 - [ ] 生成待审核笔记
 
 > 演示数据。
+
+## 关联知识
+
+[[以 Markdown 作为长期的数据格式|为什么用 Markdown 长期保存资料]]
+
+> 这是一份公开的示例引用，用于测试 WikiLinks 与反向链接。

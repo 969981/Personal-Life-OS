@@ -13,6 +13,8 @@
     "ai:organize": "node scripts/ai-organize.mjs",
     "ai:approve": "node scripts/approve-proposal.mjs",
     "memos:import": "node scripts/import-memos.mjs",
-    "test:photos": "node --test apps/web/scripts/*.test.mjs"
+    "test:photos": "node --test apps/web/scripts/*.test.mjs",
+    "ai:multi": "node scripts/ai-organize-multi.mjs",
+    "test:knowledge": "node --test apps/web/src/lib/*.test.mjs"
   }
 }

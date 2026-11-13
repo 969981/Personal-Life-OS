@@ -53,3 +53,20 @@ QuickAdd 官方手册：
 - https://quickadd.obsidian.guide/docs/Choices/Packages/
 
 > 暂不提交未经验证的 QuickAdd `data.json` 配置；保留可实际配置的标准 Capture/Macro 方案，避免覆写用户已有的插件数据。
+
+## 6. QuickAdd 与 Astro 时间线（v0.3）
+
+使用标准格式写在每日 Markdown 的 `## Timeline` 下：
+
+```markdown
+## Timeline
+
+- 09:31 💭 想随手记下来的一句话
+- 10:15 💡 需要继续研究的灵感
+
+## 今日的小事
+```
+
+Astro 的 `/moments` 自动提取此类时分条目，按日期和时间降序展示，同时保留原有独立 Moments 文件。**无需把 Diary 条目再复制成独立的 Moment 文件。**
+
+只有当前站点允许展示的 Diary 才会被提取；Public build 仍只包括 visibility: public 的演示记录。手机端可按照 [手机快捷记录](MOBILE-CAPTURE.md) 使用官方 Obsidian URI 写入同一个 Timeline。
