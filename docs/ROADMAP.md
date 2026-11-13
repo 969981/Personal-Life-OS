@@ -53,3 +53,18 @@
 - [ ] iOS/Android Obsidian URI + 断网录入实测
 - [ ] 真正运行本机大模型并评价长聊天提取质量
 - [ ] 私人 HTTPS 地址及身份验证的真实环境部署
+
+
+## v0.5 · 私人部署与备份验收
+
+- [x] Windows/手机 Obsidian Sync 的逐步操作方案及冲突风险说明
+- [x] PC→手机→PC 双向同步探针 CLI（真实跨设备仍需用户验证）
+- [x] Caddy 部署静态预检查：bcrypt hash / 全站认证 / loopback
+- [x] 真实 Docker Caddy 的匿名 401、正确账户 200、No-Store 自动化工作流
+- [x] 私人静态构建前后强制认证检查与失败关闭容器
+- [x] Tailscale Serve HTTPS / 禁止 Funnel 部署操作手册
+- [x] restic 加密备份、列表、检查和恢复演练手册
+- [ ] 用户电脑/手机 Obsidian Sync 真正激活与双向证明
+- [ ] 用户 Docker Desktop/Tailscale 配置并在真机检查 HTTP 401
+- [ ] HTTPS 私人网站完成实际上线
+- [ ] 真实个人日记和照片开始日常记录

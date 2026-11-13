@@ -56,3 +56,13 @@
 - Windows CI exercises CLI concurrent writes but cannot replace actual Obsidian QuickAdd GUI testing.
 - Wiki heading routes must preserve the URL fragment across static redirects and use Astro-generated slug IDs rather than guessing Markdown heading syntax.
 - Long chat extraction must remain bounded, local-only, quoted-evidence checked, and require approval; source immutable.
+
+
+## v0.5 private environment gate
+
+- NEVER mark actual Obsidian Sync/Tailscale/Caddy deployment completed unless verified on the user's own devices.
+- Public CI must use a synthetic bcrypt hash and dummy password; never request or upload real private credentials or vault data.
+- Fail closed: Caddy authentication must be tested for GET and HEAD of all paths before LIFE_OS_PRIVATE_BUILD is enabled.
+- Bind Caddy to 127.0.0.1 only; never enable Tailscale Funnel, publish Docker 8088 on 0.0.0.0 or deploy private dist to public artifact hosting.
+- Keep original photos and diary records out of public Git; restic backup is separate from sync and version control.
+- Sync probe contains randomized test markers only, is gitignored, and proves a real two-way check only after the user confirms phone edits.

@@ -43,3 +43,13 @@ find apps/web/dist -type f | sort
 ## 自动化
 
 AI 产生候选笔记，经人工审核才能保存到正式知识库。保留 source_refs、时间、修订历史，拒绝未经许可的全量聊天抓取。
+
+
+## v0.5：准备使用真实日记前
+
+- 先按 [SYNC-SETUP.md](SYNC-SETUP.md) 确认 Obsidian 双向同步，禁止同一 Vault 多套并发同步。
+- 再按 [BACKUP.md](BACKUP.md) 将完整 Vault 加密备份到**非公开**的独立位置并执行恢复演练。
+- [PRIVATE-DEPLOY.md](PRIVATE-DEPLOY.md) 提供 Caddy 全站 HTTP 认证实测，认证失败时不构建私人网页。
+- Docker 只监听本机 127.0.0.1，跨设备访问只能走受权限控制的 Tailscale Serve HTTPS。
+- GitHub Actions 的测试密码均为合成字符串，只用于模拟 Caddy，不能用于正式部署。
+- 即使启用私人认证，构建出的 HTML 在本机磁盘上仍为明文，请保护磁盘和 Docker 访问权限。
