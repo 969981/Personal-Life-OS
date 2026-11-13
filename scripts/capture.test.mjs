@@ -28,6 +28,7 @@ test('captures diary, moment and chat locally with private visibility', async (t
   assert.match(diary,/visibility: private/);
   assert.match(diary,/第一条测试碎碎念/);
   assert.match(diary,/第二条测试碎碎念/);
+  assert.ok(diary.indexOf('第一条测试碎碎念')<diary.indexOf('第二条测试碎碎念'));
   assert.equal((await readdir(join(vault,'Moments'))).length,1);
   const chats = await readdir(join(vault,'Chat-Captures'));
   const chat = await readFile(join(vault,'Chat-Captures',chats[0]),'utf8');

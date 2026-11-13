@@ -1,4 +1,5 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { appendDiaryEntry } from './diary-storage.mjs';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { resolve, join } from 'node:path';
@@ -38,23 +39,8 @@ const folder = type === 'chat' ? 'Chat-Captures' : type === 'diary' ? 'Diary' : 
 const target = type === 'diary' ? join(vault,folder,yyyy,mm,date + '.md') : join(vault,folder,date + '-' + token + '.md');
 await mkdir(resolve(target,'..'), { recursive: true });
 if (type === 'diary') {
-  const line = '- ' + time + ' 💭 ' + text.replaceAll('\n','\n  ') + '\n';
-  let current;
-  try { current = await readFile(target,'utf8'); }
-  catch (error) { if (error.code !== 'ENOENT') throw error; }
-  if (current === undefined) {
-    const header = '---\ntitle: ' + yaml(date + ' 日记') + '\ntype: diary\ndate: ' + yaml(date) +
-      '\nvisibility: private\ntags: [daily]\n---\n\n# ' + date + ' · 日记\n\n## Timeline\n\n';
-    await writeFile(target,header + line,{flag:'wx'});
-  } else {
-    const matched = current.match(/^## Timeline[^\n]*\r?\n/m);
-    if (matched) {
-      const position = matched.index + matched[0].length;
-      await writeFile(target,current.slice(0,position) + '\n' + line + current.slice(position),'utf8');
-    } else {
-      await writeFile(target,current.trimEnd() + '\n\n## Timeline\n\n' + line,'utf8');
-    }
-  }
+  const line = '- '+time+' 💭 '+text.replaceAll('\n','\n  ');
+  await appendDiaryEntry(target,date,line);
 } else {
   const noteType = type === 'chat' ? 'knowledge' : type;
   const front = '---\ntitle: ' + yaml(safeTitle) + '\ntype: ' + noteType +
