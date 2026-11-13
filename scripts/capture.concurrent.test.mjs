@@ -23,8 +23,7 @@ test('12 concurrent capture processes on this OS do not lose or duplicate entrie
   const [month]=await readdir(join(vault,'Diary',year));
   const [file]=await readdir(join(vault,'Diary',year,month));
   const document=await readFile(join(vault,'Diary',year,month,file),'utf8');
-  for(let i=0;i<12;i++){
-    assert.equal(document.split('concurrent record '+i+'\\n').length-1,1,'capture '+i+' should appear exactly once');
-  }
-  assert.equal((document.match(/^- \d\d:\d\d 💭 concurrent record /gm)||[]).length,12);
+  const captured=[...document.matchAll(/^- \\d\\d:\\d\\d 💭 concurrent record (\\d+)$/gm)].map(match=>Number(match[1]));
+  assert.equal(captured.length,12);
+  assert.deepEqual([...captured].sort((a,b)=>a-b),Array.from({length:12},(_,i)=>i));
 });

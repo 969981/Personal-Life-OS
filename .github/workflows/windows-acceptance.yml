@@ -1,0 +1,33 @@
+name: Windows Capture Acceptance (simulated)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-capture:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      LIFE_OS_PRIVATE_BUILD: ""
+      LIFE_OS_SHOW_PRIVATE: "false"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Windows diary concurrency + chat/Memos/AI unit tests
+        run: npm test
+      - name: Wiki heading, mobile offline-cache and Timeline unit tests
+        run: npm run test:knowledge
+      - name: Check Windows private files did not enter git
+        shell: pwsh
+        run: |
+          $tracked = git ls-files 'vault/Diary/**' 'vault/Chat-Captures/**' 'vault/Attachments/**'
+          if ($tracked) { throw 'Private files tracked in public Git repository.' }
+          Write-Output 'Windows simulated capture tests succeeded (not a real Obsidian GUI test).'
