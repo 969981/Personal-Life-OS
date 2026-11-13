@@ -39,3 +39,21 @@ node scripts/approve-proposal.mjs --id <16位编号> --target Ideas
 
 - 多主题拆分、关联现有 Obsidian 双向链接、内容哈希去重与合并建议。
 - 经用户明确授权后接入其他 AI provider；不默认传输原始聊天数据。
+
+## 多灵感拆分（v0.3）
+
+明确选择一份本地聊天摘录，在本机 Ollama 一次拆分多条候选：
+
+```bash
+npm run ai:multi -- --input vault/Chat-Captures/你的聊天.md --max 6
+```
+
+默认最多六条，最高八条。每条必须提供逐字存在于原文中的 evidence，缺少证据的自动拒绝。每条分别保存 SHA-256、原始文件路径、原文依据和 pending-review 状态；模型不会覆盖原始聊天。
+
+在 Obsidian 人工审核后，逐条执行原有审批命令：
+
+```bash
+npm run ai:approve -- --id 16位编号 --target Ideas
+```
+
+重新运行相同输入会跳过同来源的已有候选，避免无意覆盖。这不是全局语义去重，模型提炼也不等于事实已验证。

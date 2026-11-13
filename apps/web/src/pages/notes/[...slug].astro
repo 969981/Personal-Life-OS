@@ -1,13 +1,15 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { visibleNotes, dateText, noteDate } from '../../lib/notes';
+import { visibleNotes, dateText, noteDate, noteHref } from '../../lib/notes';
+import { incomingLinks } from '../../lib/knowledge.mjs';
 export async function getStaticPaths() {
   const notes = await visibleNotes();
   return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
 }
 const { note } = Astro.props as { note: CollectionEntry<'notes'> };
 const { Content } = await render(note);
+const backlinks=incomingLinks(await visibleNotes(),note);
 const sectionPath: Record<string,string> = { diary:'/diary', moment:'/moments', idea:'/ideas', knowledge:'/knowledge', project:'/projects', review:'/' };
 const back = sectionPath[note.data.type] ?? '/';
 ---
@@ -26,5 +28,11 @@ const back = sectionPath[note.data.type] ?? '/';
     </header>
     {note.data.type === 'photo' && note.data.photo_file && <div class="article-photo"><img src={'/_gallery/'+note.data.photo_file} alt={note.data.title} loading="eager" /></div>}
     <div class="article-body"><Content /></div>
+    {backlinks.length>0&&<aside class="backlinks" aria-label="反向链接">
+      <h2>↩ 哪些笔记链接到这里</h2>
+      <div class="backlinks-list">{backlinks.map((item)=>
+        <a href={noteHref(item)}><strong>{item.data.title}</strong><span>↗</span></a>
+      )}</div>
+    </aside>}
   </article>
 </BaseLayout>

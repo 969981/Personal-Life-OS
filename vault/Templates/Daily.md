@@ -12,9 +12,9 @@ tags: [daily]
 
 ## Timeline
 
-- {{time:HH:mm}} 💭 
-
 ## 今日的小事
+
+## 今日待办
 
 ## 值得继续探索的灵感
 

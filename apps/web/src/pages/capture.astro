@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="快捷记录" active="capture">
+  <p class="page-eyebrow">QUICK CAPTURE / KEEP YOUR THOUGHTS</p>
+  <h1 class="page-title">想到了，就记下来。</h1>
+  <p class="page-description">手机或电脑都可以直接输入。点击“写入 Obsidian”后，将通过手机系统调用已安装的 Obsidian，内容写在自己的 Vault，不经过 Personal Life OS 的后端服务器。</p>
+  <form class="capture-form" id="capture-form">
+    <div class="field">
+      <label for="capture-type">记录类型</label>
+      <select id="capture-type">
+        <option value="moment">💭 碎碎念 → 今天的 Timeline</option>
+        <option value="diary">📝 日记片段 → 今天的 Timeline</option>
+        <option value="idea">💡 灵感 → 独立 Ideas 笔记</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="capture-text">此刻想到的内容</label>
+      <textarea id="capture-text" maxlength="2500" placeholder="就写一句话也可以。" required spellcheck="true"></textarea>
+    </div>
+    <div class="field">
+      <label for="vault-name">Obsidian Vault 名称或 ID</label>
+      <input id="vault-name" autocomplete="off" required placeholder="例如 vault" maxlength="120" />
+    </div>
+    <div class="form-actions">
+      <button class="button primary" type="submit">✎ 写入 Obsidian</button>
+      <button class="button" id="capture-copy" type="button">复制 Markdown</button>
+    </div>
+    <p class="capture-status" id="capture-status" role="status" aria-live="polite"></p>
+    <p class="capture-note">需要先在当前设备安装 Obsidian，并启用 Daily Notes 核心插件；每日笔记模板应含有 <code>## Timeline</code>。手机未安装 Obsidian 时，可先“复制 Markdown”后手动保存。此页面不缓存或上传正文；只在当前浏览器保存 Vault 名称。</p>
+  </form>
+  <div class="mini-panel" style="max-width:750px;margin-top:20px">
+    <h2 class="panel-heading">手机桌面快捷入口</h2>
+    <p class="page-description" style="margin:0">在 Safari 使用“分享 → 添加到主屏幕”，或在 Android Chrome 选择“添加到主屏幕”。之后点开 Life OS → 快捷记录。网页需要联网打开，但内容不会由网站存储；同步取决于你自己在 Obsidian 中配置的方式。</p>
+  </div>
+  <script>
+    const form=document.querySelector<HTMLFormElement>('#capture-form');
+    const vault=document.querySelector<HTMLInputElement>('#vault-name');
+    const body=document.querySelector<HTMLTextAreaElement>('#capture-text');
+    const type=document.querySelector<HTMLSelectElement>('#capture-type');
+    const status=document.querySelector<HTMLElement>('#capture-status');
+    const copy=document.querySelector<HTMLButtonElement>('#capture-copy');
+    const stored=localStorage.getItem('life-os-vault-name');
+    if(vault&&stored)vault.value=stored;
+    vault?.addEventListener('change',()=>{
+      if(vault.value.trim())localStorage.setItem('life-os-vault-name',vault.value.trim());
+    });
+    const pad=(n:number)=>String(n).padStart(2,'0');
+    function textPayload(){
+      const message=body?.value.trim()??'';
+      if(!message)throw new Error('先写一点内容，再保存。');
+      const now=new Date();
+      const date=[now.getFullYear(),pad(now.getMonth()+1),pad(now.getDate())].join('-');
+      const time=pad(now.getHours())+':'+pad(now.getMinutes());
+      const mode=type?.value??'moment';
+      if(mode==='idea'){
+        const title=message.split('\n')[0].slice(0,65);
+        const content=[
+          '---','title: '+JSON.stringify(title),'type: idea',
+          'created: '+JSON.stringify(date),'visibility: private',
+          'status: inbox','tags: [idea]','---','','# '+title,'',message,''
+        ].join('\n');
+        const suffix=Date.now().toString(36);
+        return {content,action:'new',file:'Ideas/'+date+'-'+suffix+'.md'};
+      }
+      return {
+        content:'- '+time+' '+(mode==='diary'?'📝':'💭')+' '+message.replace(/\r?\n/g,'\n  '),
+        action:'daily'
+      };
+    }
+    form?.addEventListener('submit',(event)=>{
+      event.preventDefault();
+      if(!vault?.value.trim()){
+        if(status)status.textContent='请填写 Obsidian Vault 名称或 ID。';
+        return;
+      }
+      try{
+        const payload=textPayload();
+        const uri=new URL('obsidian://'+payload.action);
+        uri.searchParams.set('vault',vault.value.trim());
+        uri.searchParams.set('content',payload.content);
+        if(payload.action==='daily'){
+          uri.searchParams.set('append','true');
+          uri.searchParams.set('heading','Timeline');
+          uri.searchParams.set('spacing','newline');
+        }else if(payload.file){
+          uri.searchParams.set('file',payload.file);
+        }
+        localStorage.setItem('life-os-vault-name',vault.value.trim());
+        if(status)status.textContent='正在请求打开 Obsidian。请在 Obsidian 中确认已保存；浏览器无法验证外部 App 是否写入成功。';
+        window.location.href=uri.toString();
+      }catch(error){
+        if(status)status.textContent=error instanceof Error?error.message:'记录出错';
+      }
+    });
+    copy?.addEventListener('click',async()=>{
+      try{
+        const value=textPayload().content;
+        await navigator.clipboard.writeText(value);
+        if(status)status.textContent='Markdown 已复制，打开 Obsidian 粘贴即可。';
+      }catch(error){
+        if(status)status.textContent='复制失败，请手动选中文本或检查浏览器剪贴板权限。';
+      }
+    });
+  </script>
+</BaseLayout>

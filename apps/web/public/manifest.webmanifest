@@ -1,0 +1,17 @@
+{
+  "name": "Personal Life OS · 快捷记录",
+  "short_name": "Life OS",
+  "start_url": "/capture",
+  "display": "standalone",
+  "background_color": "#090e18",
+  "theme_color": "#0c1523",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

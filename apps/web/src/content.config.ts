@@ -14,6 +14,7 @@ const notes = defineCollection({
     created: z.coerce.date().optional(),
     summary: z.string().optional(),
     tags: z.array(z.string()).default([]),
+    aliases: z.array(z.string()).default([]),
     visibility: z.enum(['public', 'private', 'local-only']).default('private'),
     demo: z.boolean().default(false),
     status: z.string().optional(),

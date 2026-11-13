@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { visibleNotes, noteHref } from '../../lib/notes';
+import { wikiReferences, normalizeTarget, resolveWiki } from '../../lib/knowledge.mjs';
+export async function getStaticPaths(){
+  const notes=await visibleNotes();
+  const targets=new Set();
+  for(const note of notes)for(const ref of wikiReferences(note.body??'')){
+    const target=normalizeTarget(ref.target);
+    if(target)targets.add(target);
+  }
+  // Same-vault standard Markdown links are rewritten by remark-wikilinks.
+  // Emit their destinations as static routes too, including relative paths.
+  for(const note of notes){
+    const folder=note.id.split('/').slice(0,-1).join('/');
+    const body=note.body??'';
+    for(const match of body.matchAll(/(?<!!)\[[^\]\n]+\]\(([^)\n]+\.md)(?:#[^)\n]*)?\)/g)){
+      const ref=match[1].trim();
+      if(/^(https?:|data:|\/\/)/i.test(ref))continue;
+      const path=normalizeTarget(ref.startsWith('/')?ref:folder+'/'+ref);
+      if(path)targets.add(path);
+    }
+  }
+  return [...targets].map(target=>({params:{target},props:{target}}));
+}
+const {target}=Astro.props;
+const notes=await visibleNotes();
+const destination=resolveWiki(notes,target);
+if(destination)return Astro.redirect(noteHref(destination));
+---
+<BaseLayout title="未找到笔记">
+  <p class="page-eyebrow">WIKI / UNRESOLVED</p>
+  <h1 class="page-title">暂时无法打开这条笔记链接。</h1>
+  <p class="page-description">目标可能尚未创建、名称存在歧义，或不在当前网站允许展示的范围内。出于隐私保护，不会列出任何私人笔记。</p>
+  <a class="button" href="/knowledge">返回知识库</a>
+</BaseLayout>

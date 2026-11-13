@@ -2,7 +2,7 @@
 
 > 日常碎碎念、Diary 日记、聊天灵感、知识库和项目，最后成为一个属于自己的 Markdown 数字生活空间。
 
-**当前状态：v0.2 工具链预览 · Astro + Obsidian · 本仓库暂时为 Public。**
+**当前状态：v0.3 每日记录与链接预览 · Astro + Obsidian · 本仓库暂时为 Public。**
 
 ⚠️ **请勿上传真实私人日记、聊天记录、照片、身份证件、账户或其他敏感数据。** 已设置 Git 忽略规则，但不是泄露保险：强制添加、已经提交的历史、工作流日志和第三方部署都可能泄露内容。详见 [隐私指南](docs/PRIVACY.md)。
 
@@ -30,14 +30,15 @@ npm run dev
 | --- | --- | --- |
 | 生活首页 | / | Dashboard、统计、最新记录 |
 | Diary 日记 | /diary | Markdown 列表与阅读 |
-| 碎碎念 | /moments | 时间线 |
+| 碎碎念 | /moments | Diary Timeline + 独立 Moment 合并时间线 |
 | 日历 | /calendar | 月份切换、日期跳转 |
 | 灵感 | /ideas | 卡片与状态 |
 | 知识库 | /knowledge | Markdown 内容 |
 | 项目 | /projects | 项目卡片 |
 | 相册 | /photos | 私人图像导入、WebP、可见图片墙 |
+| 快捷记录 | /capture | 手机调用 Obsidian 官方 URI，零后端 |
 | 搜索 | /search | 已展示笔记的标题、标签和摘要搜索 |
-| AI 整理 | CLI | 本地 Ollama 生成待审核笔记，需自行安装模型 |
+| AI 整理 | CLI | 本地 Ollama 单篇/多篇候选灵感，保留原文证据，需人工审核 |
 | Memos | CLI | JSON/API 单向私有导入（可选） |
 | Quartz / SilverBullet | — | 可选参考，不引入第二套主数据 |
 
@@ -83,6 +84,7 @@ Diary 会追加到当天文件的 Timeline 标题下；chat 会保留原文并�
 - [本地 AI 整理](docs/AI-ORGANIZER.md)：Ollama 结构化提取，先进入 00-Inbox/AI-Proposals，审核后才移动到 Ideas/Knowledge/Projects；
 - [Memos 导入](docs/MEMOS.md)：可从 JSON 或授权 API 导入到 Moments，dry-run 默认开启，默认私密；
 - [私人相册](docs/PHOTOS.md)：sharp 去 EXIF、生成 WebP、生成允许发布的静态图片列表；
+- [手机快捷记录](docs/MOBILE-CAPTURE.md)：官方 Obsidian URI，将一句话追加到当日日记，主屏快捷入口；
 - [带认证的私有站点](docs/PRIVATE-DEPLOY.md)：本机 Caddy 全站 Basic Auth + Tailscale Serve，未自动部署。
 
 ```bash
@@ -91,6 +93,7 @@ npm run dev:private
 
 # 需自行安装并运行本地 Ollama
 npm run ai:organize -- --input vault/Chat-Captures/摘录.md
+npm run ai:multi -- --input vault/Chat-Captures/摘录.md --max 6
 npm run ai:approve -- --id 16位编号 --target Ideas
 
 # 导入 Memos：先预览，不执行写入
@@ -123,6 +126,7 @@ npm run preview
 - [Memos 导入](docs/MEMOS.md)
 - [相册](docs/PHOTOS.md)
 - [私人网页认证部署](docs/PRIVATE-DEPLOY.md)
+- [手机快捷记录](docs/MOBILE-CAPTURE.md)
 - [AI 协作规则](AGENTS.md)
 
 License：尚未决定，当前不应假定获得复用授权。
