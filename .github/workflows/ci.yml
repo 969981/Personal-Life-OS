@@ -2,7 +2,7 @@ name: CI (public samples only)
 
 on:
   push:
-    branches: [main, feat/personal-life-os-foundation, feat/capture-ai-memos-photos-private-deploy]
+    branches: [main, feat/personal-life-os-foundation]
   pull_request:
   workflow_dispatch:
 
@@ -42,8 +42,6 @@ jobs:
           EOF
       - name: Install
         run: npm install --prefix apps/web --no-audit --no-fund
-      - name: Test photo importer (EXIF and publishing allowlist)
-        run: npm run test:photos
       - name: Build public-only website
         run: npm run build
       - name: Verify generated site
@@ -56,8 +54,4 @@ jobs:
             echo "ERROR: private content leaked into the public build"
             exit 1
           fi
-          if find apps/web/dist/_gallery -type f | grep -q .; then
-            echo "ERROR: public build unexpectedly includes photo files."
-            exit 1
-          fi
-          echo "Public demo build generated without private canary or photos."
+          echo "Public demo build generated without private canary."

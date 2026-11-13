@@ -2,7 +2,7 @@
 
 > 日常碎碎念、Diary 日记、聊天灵感、知识库和项目，最后成为一个属于自己的 Markdown 数字生活空间。
 
-**当前状态：v0.2 工具链预览 · Astro + Obsidian · 本仓库暂时为 Public。**
+**当前状态：v0.1 原型 · Astro + Obsidian · 本仓库暂时为 Public。**
 
 ⚠️ **请勿上传真实私人日记、聊天记录、照片、身份证件、账户或其他敏感数据。** 已设置 Git 忽略规则，但不是泄露保险：强制添加、已经提交的历史、工作流日志和第三方部署都可能泄露内容。详见 [隐私指南](docs/PRIVACY.md)。
 
@@ -35,11 +35,10 @@ npm run dev
 | 灵感 | /ideas | 卡片与状态 |
 | 知识库 | /knowledge | Markdown 内容 |
 | 项目 | /projects | 项目卡片 |
-| 相册 | /photos | 私人图像导入、WebP、可见图片墙 |
+| 相册 | /photos | 安全占位，暂不上传私人照片 |
 | 搜索 | /search | 已展示笔记的标题、标签和摘要搜索 |
-| AI 整理 | CLI | 本地 Ollama 生成待审核笔记，需自行安装模型 |
-| Memos | CLI | JSON/API 单向私有导入（可选） |
-| Quartz / SilverBullet | — | 可选参考，不引入第二套主数据 |
+| AI 自动整理 | — | 设计中，尚未启用 |
+| Memos / Quartz / SilverBullet | — | 可选集成，不引入第二套主数据 |
 
 ## 目录
 
@@ -77,32 +76,6 @@ npm run capture -- --type chat --title "聊天摘录" --source "ChatGPT" --text 
 
 Diary 会追加到当天文件的 Timeline 标题下；chat 会保留原文并等待 AI 审核。该工具不会自动上传或同步聊天。
 
-## QuickAdd / 本地 AI / Memos / 相册
-
-- [QuickAdd 快捷键与宏配置](docs/QUICKADD.md)：一键 Diary、待办、聊天原文摘录；
-- [本地 AI 整理](docs/AI-ORGANIZER.md)：Ollama 结构化提取，先进入 00-Inbox/AI-Proposals，审核后才移动到 Ideas/Knowledge/Projects；
-- [Memos 导入](docs/MEMOS.md)：可从 JSON 或授权 API 导入到 Moments，dry-run 默认开启，默认私密；
-- [私人相册](docs/PHOTOS.md)：sharp 去 EXIF、生成 WebP、生成允许发布的静态图片列表；
-- [带认证的私有站点](docs/PRIVATE-DEPLOY.md)：本机 Caddy 全站 Basic Auth + Tailscale Serve，未自动部署。
-
-```bash
-# 在 Obsidian 里设置 QuickAdd，详见 docs/QUICKADD.md
-npm run dev:private
-
-# 需自行安装并运行本地 Ollama
-npm run ai:organize -- --input vault/Chat-Captures/摘录.md
-npm run ai:approve -- --id 16位编号 --target Ideas
-
-# 导入 Memos：先预览，不执行写入
-npm run memos:import -- --file /path/memos-export.json
-npm run memos:import -- --file /path/memos-export.json --apply
-
-# 导入私人照片
-npm run photos:import -- --file /path/photo.jpg --title "某天的照片"
-```
-
-**重要：** 上述代码和命令不会自动连接你的 ChatGPT 历史、Memos 账号或云端相册，也不会自动发布私人网页。所有外部来源和真人记录均需要用户自行授权或明确选择。
-
 ## 构建
 
 ~~~bash
@@ -118,11 +91,6 @@ npm run preview
 - [隐私与公开仓库防护](docs/PRIVACY.md)
 - [开源项目融合方案](docs/INTEGRATIONS.md)
 - [开发路线](docs/ROADMAP.md)
-- [QuickAdd 设置](docs/QUICKADD.md)
-- [AI 本地整理](docs/AI-ORGANIZER.md)
-- [Memos 导入](docs/MEMOS.md)
-- [相册](docs/PHOTOS.md)
-- [私人网页认证部署](docs/PRIVATE-DEPLOY.md)
 - [AI 协作规则](AGENTS.md)
 
 License：尚未决定，当前不应假定获得复用授权。
