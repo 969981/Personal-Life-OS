@@ -37,3 +37,17 @@ test('Ambiguous name does not guess; traversal above vault is rejected',()=>{
   assert.equal(resolveWiki([a,b],'Ideas/Alpha')?.id,a.id);
   assert.equal(wikiTargetHref('../../secret'),'#');
 });
+
+test('Remark links keep code untouched and map local Markdown links through the safe wiki router', async()=>{
+  const {default:plugin}=await import('./remark-wikilinks.mjs');
+  const textNode={type:'text',value:'请看 [[知识链接|别名]]'};
+  const markdownLink={type:'link',url:'../Knowledge/foo.md#Section',children:[{type:'text',value:'普通链接'}]};
+  const inlineCode={type:'inlineCode',value:'[[禁止转换]]'};
+  const root={type:'root',children:[{type:'paragraph',children:[textNode,markdownLink,inlineCode]}]};
+  plugin()(root,{path:'/repo/vault/Ideas/example.md'});
+  const items=root.children[0].children;
+  assert.equal(items[1].type,'link');
+  assert.match(items[1].url,/^\/wiki\/知识链接/);
+  assert.equal(items[2].url,'/wiki/knowledge/foo#section');
+  assert.equal(items[3].type,'inlineCode');
+});

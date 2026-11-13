@@ -1,5 +1,5 @@
 
-import {wikiReferences,wikiTargetHref} from './knowledge.mjs';
+import {wikiReferences,wikiTargetHref,normalizeTarget} from './knowledge.mjs';
 const tokens=/(!?)\[\[([^\[\]\r\n]+?)\]\]/g;
 function rewriteText(value){
   const output=[];let cursor=0;
@@ -16,10 +16,24 @@ function rewriteText(value){
   return output.length?output:[{type:'text',value}];
 }
 export default function remarkWikilinks(){
-  return (tree)=>{
+  return (tree,file)=>{
+    const origin=String(file?.path??'').replaceAll('\\','/');
+    const marker=origin.lastIndexOf('/vault/');
+    const source=marker>=0?origin.slice(marker+7):'';
+    const directory=source.split('/').slice(0,-1).join('/');
     function walk(node){
       if(!Array.isArray(node.children))return;
-      if(['link','linkReference','image','imageReference','code','inlineCode','html'].includes(node.type))return;
+      if(node.type==='link' && typeof node.url==='string'){
+        // Rewrite local Markdown links through the same privacy-filtered Wiki router.
+        const match=node.url.match(/^([^?#]+\.md)(?:#([^?]+))?$/i);
+        if(match&&!/^(https?:|data:|\/\/)/i.test(match[1])){
+          const local=match[1].startsWith('/')?match[1].slice(1):((directory?directory+'/':'')+match[1]);
+          const resolved=normalizeTarget(local);
+          if(resolved)node.url=wikiTargetHref(resolved,match[2]??'');
+        }
+        return;
+      }
+      if(['linkReference','image','imageReference','code','inlineCode','html'].includes(node.type))return;
       const out=[];
       for(const child of node.children){
         if(child.type==='text'&&child.value.includes('[['))out.push(...rewriteText(child.value));
