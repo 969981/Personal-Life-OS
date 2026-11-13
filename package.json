@@ -5,6 +5,8 @@
     "dev": "npm --prefix apps/web run dev",
     "build": "npm --prefix apps/web run build",
     "preview": "npm --prefix apps/web run preview",
-    "init:vault": "node scripts/init-vault.mjs"
+    "init:vault": "node scripts/init-vault.mjs",
+    "capture": "node scripts/capture.mjs",
+    "test": "node --test scripts/*.test.mjs"
   }
 }

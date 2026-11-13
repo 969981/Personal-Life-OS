@@ -64,6 +64,19 @@ tags: [daily, life]
 
 **数据原则：** Markdown 是主数据；Obsidian 是编辑器，Astro 是只读展示，Git 是版本历史。AI 仅生成候选内容，默认不能修改原始记录。
 
+## 随手记和聊天摘录（本地）
+
+本项目提供不依赖 AI API 的本地捕捉命令。它会在被 Git 忽略的私人文件夹写入 Markdown，默认 visibility: private。
+
+~~~bash
+npm run capture -- --type diary --text "今天突然想到一个新点子"
+npm run capture -- --type moment --text "随手记的一句话"
+npm run capture -- --type idea --title "个人时间线" --text "我的灵感"
+npm run capture -- --type chat --title "聊天摘录" --source "ChatGPT" --text "保留的原文"
+~~~
+
+Diary 会追加到当天文件的 Timeline 标题下；chat 会保留原文并等待 AI 审核。该工具不会自动上传或同步聊天。
+
 ## 构建
 
 ~~~bash
