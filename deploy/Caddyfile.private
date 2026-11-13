@@ -1,0 +1,13 @@
+# Access control applies to ALL requests, including static media and source maps.
+# Bind externally only through localhost + Tailscale Serve, not directly on public Internet.
+:80 {
+  basic_auth {
+    {$LIFE_OS_BASIC_USER} {$LIFE_OS_BASIC_HASH}
+  }
+  root * /srv
+  encode gzip
+  header Cache-Control "private, no-store"
+  header X-Robots-Tag "noindex, nofollow"
+  header X-Content-Type-Options "nosniff"
+  file_server
+}

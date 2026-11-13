@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 const root = new URL('../vault/', import.meta.url);
 const paths = [
-  '00-Inbox', 'Diary', 'Moments', 'Ideas', 'Knowledge', 'Projects',
+  '00-Inbox', 'Diary', 'Moments', 'Ideas', 'Knowledge', 'Projects', 'Photos', 'Photo-Media',
   'Life', 'Reviews', 'Chat-Captures', 'Attachments',
 ];
 for (const path of paths) {
