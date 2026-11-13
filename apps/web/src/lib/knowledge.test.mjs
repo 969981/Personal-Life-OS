@@ -47,7 +47,7 @@ test('Remark links keep code untouched and map local Markdown links through the 
   plugin()(root,{path:'/repo/vault/Ideas/example.md'});
   const items=root.children[0].children;
   assert.equal(items[1].type,'link');
-  assert.match(items[1].url,/^\/wiki\/知识链接/);
+  assert.equal(decodeURIComponent(items[1].url),'/wiki/知识链接');
   assert.equal(items[2].url,'/wiki/knowledge/foo#section');
   assert.equal(items[3].type,'inlineCode');
 });
