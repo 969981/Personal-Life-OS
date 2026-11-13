@@ -9,6 +9,7 @@ interface Props {
 const { title, description = '把每天的点滴整理成自己的数字生活空间。', active = '' } = Astro.props;
 const privatePreview = mayShowPrivate();
 const navigation = [
+  { label: '快捷记录', icon: '✎', href: '/capture', key: 'capture' },
   { label: '生活首页', icon: '⌂', href: '/', key: 'home' },
   { label: '日记', icon: '▤', href: '/diary', key: 'diary' },
   { label: '碎碎念', icon: '◌', href: '/moments', key: 'moments' },
@@ -28,6 +29,8 @@ const navigation = [
     <meta name="description" content={description}/>
     <meta name="robots" content="noindex, nofollow"/>
     <meta name="color-scheme" content="dark"/>
+    <meta name="theme-color" content="#0c1523"/>
+    <link rel="manifest" href="/manifest.webmanifest"/>
     <title>{title} · Personal Life OS</title>
   </head>
   <body>
@@ -47,7 +50,7 @@ const navigation = [
           <div class="tiny-orbit">☼</div>
           <strong>写下生活，留住灵感。</strong>
           <p>所有内容都由 Markdown 驱动。</p>
-          <span class="side-version">Personal Life OS · v0.1</span>
+          <span class="side-version">Personal Life OS · v0.3</span>
         </div>
       </aside>
       <div class="main-area">
@@ -66,7 +69,7 @@ const navigation = [
       </div>
     </div>
     <nav class="mobile-nav" aria-label="移动导航">
-      {navigation.filter((item) => ['home','diary','moments','ideas','search'].includes(item.key)).map((item) =>
+      {navigation.filter((item) => ['home','capture','diary','moments','search'].includes(item.key)).map((item) =>
         <a href={item.href} class:list={[{ selected: active === item.key }]}><span>{item.icon}</span>{item.label}</a>
       )}
     </nav>

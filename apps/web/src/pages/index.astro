@@ -2,10 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NoteCard from '../components/NoteCard.astro';
 import { visibleNotes, sectionNotes, noteDate, dateText, noteHref } from '../lib/notes';
+import { timelineItems } from '../lib/knowledge.mjs';
 const notes = await visibleNotes();
 const diary = sectionNotes(notes, 'diary');
 const ideas = sectionNotes(notes, 'idea');
-const moments = sectionNotes(notes, 'moment');
+const moments = timelineItems(notes);
 const latest = notes.slice(0,3);
 const latestDiaries = diary.slice(0,3);
 const dateLabel = new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:'Asia/Shanghai'}).format(new Date());
@@ -16,7 +17,8 @@ const dateLabel = new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',d
     <h1>记录生活，也记录想法。</h1>
     <p>一天的一句话、偶然的灵感、做过的研究，都值得有一个属于自己的地方。慢慢写，慢慢积累。</p>
     <div class="hero-actions">
-      <a class="button primary" href="/diary">翻看日记 ↗</a>
+      <a class="button primary" href="/capture">＋ 随手记录</a>
+      <a class="button" href="/diary">翻看日记 ↗</a>
       <a class="button" href="/ideas">探索灵感 ✦</a>
     </div>
   </section>
