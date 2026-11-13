@@ -1,7 +1,7 @@
 {
   "name": "Personal Life OS · 快捷记录",
   "short_name": "Life OS",
-  "start_url": "/capture",
+  "start_url": "/capture/",
   "display": "standalone",
   "background_color": "#090e18",
   "theme_color": "#0c1523",
@@ -13,5 +13,6 @@
       "type": "image/svg+xml",
       "purpose": "any"
     }
-  ]
+  ],
+  "scope": "/capture/"
 }

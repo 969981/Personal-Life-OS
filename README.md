@@ -36,7 +36,7 @@ npm run dev
 | 知识库 | /knowledge | Markdown 内容 |
 | 项目 | /projects | 项目卡片 |
 | 相册 | /photos | 私人图像导入、WebP、可见图片墙 |
-| 快捷记录 | /capture | 手机调用 Obsidian 官方 URI，零后端 |
+| 快捷记录 | /capture | 官方 Obsidian URI + 无私人缓存的离线空白表单 |
 | 搜索 | /search | 已展示笔记的标题、标签和摘要搜索 |
 | AI 整理 | CLI | 本地 Ollama 单篇/多篇候选灵感，保留原文证据，需人工审核 |
 | Memos | CLI | JSON/API 单向私有导入（可选） |

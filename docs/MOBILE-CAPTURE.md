@@ -16,7 +16,7 @@ Life OS 静态网站的 /capture 页面只负责接收文本并构造官方 Obsi
 2. 启用 Daily Notes，并设置 folder=Diary，format=YYYY/MM/YYYY-MM-DD，template=Templates/Daily。
 3. 进入私人 Life OS 网站的 /capture，填入真实 Vault 名称或 ID。
 4. 写一句话，点击“写入 Obsidian”；切换到 Obsidian 检查 Timeline 是否新增。
-5. Safari 用“添加到主屏幕”，Android Chrome 用“添加到主屏幕”。页面需要联网访问；当前不是离线 Web App。
+5. Safari 用“添加到主屏幕”，Android Chrome 用“添加到主屏幕”。首次安装需要联网。页面注册只作用于 /capture/ 的 Service Worker，之后断网可打开精简版空白表单。仅缓存 /capture/offline.html，不缓存私人笔记正文、照片或搜索内容。
 
 ## 需要注意
 

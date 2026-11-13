@@ -55,6 +55,8 @@ jobs:
           test -f apps/web/dist/calendar/index.html
           test -f apps/web/dist/search/index.html
           test -f apps/web/dist/capture/index.html
+          test -f apps/web/dist/capture/offline.html
+          test -f apps/web/dist/capture/sw.js
           test -f apps/web/dist/moments/index.html
           test -f apps/web/dist/wiki/samples/knowledge-demo/index.html
           if grep -R -q 'SECRET_PRIVATE_CONTENT_MUST_NOT_APPEAR\|CI PRIVATE CANARY' apps/web/dist; then
@@ -67,4 +69,8 @@ jobs:
           fi
           grep -q '今天想试试把碎碎念变成能长久保存' apps/web/dist/moments/index.html
           grep -q '哪些笔记链接到这里' apps/web/dist/notes/samples/knowledge-demo/index.html
+          grep -q 'life-embed-frame' apps/web/dist/notes/samples/idea-demo/index.html
+          test -f "apps/web/dist/embed/以 markdown 作为长期的数据格式/index.html"
+          grep -q "frame-src 'none'" "apps/web/dist/embed/以 markdown 作为长期的数据格式/index.html"
+          grep -q 'data-headings=' "apps/web/dist/wiki/以 markdown 作为长期的数据格式/index.html"
           echo "Public build verified Diary Timeline, backlinks and privacy canary."
