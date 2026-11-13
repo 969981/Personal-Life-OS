@@ -32,3 +32,12 @@
 - Public builds produce no private pages, search data or media.
 - Demonstration data visibly marked demo.
 - Obsidian templates work independently of Astro.
+
+## Additional integration rules
+
+- Memos imports must stay one-way, private and idempotent. Never modify or delete Memos records.
+- AI inference must remain local-only by default; preserve raw chat and require human approval before promotion.
+- Photo sources and generated media belong in git-ignored vault folders. Use sharp to re-encode and strip original metadata.
+- Public builds may only copy images with explicit visibility: public through scripts/prepare-photos.mjs.
+- The private Caddy deployment must listen on 127.0.0.1 and block unauthenticated access to HTML and image URLs.
+- Never imply that a local Docker/Tailscale config is already deployed or authenticated without real device tests.

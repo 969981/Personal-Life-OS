@@ -4,12 +4,13 @@
 
 ## 已有措施
 
-1. 根目录 .gitignore 排除所有真实生活记录路径。
+1. 根目录 .gitignore 排除所有真实生活记录路径、Photos、Photo-Media 和临时 _gallery 图片。
 2. 公开演示只放在 vault/Samples，全部设置 demo: true 与 visibility: public。
 3. visibility 缺省为 private，Astro 默认构建只输出 public 内容。
 4. local-only 笔记不进入生产静态构建。
 5. GitHub Actions 仅运行构建，不部署到 GitHub Pages 或公网上。
 6. HTML 有 noindex，但 noindex 不是身份认证。
+7. 图片导入采用 WebP 重新编码，静态构建仅复制允许发布的图片，私有构建必须在受认证保护的环境运行。
 
 ## 本地检查
 
@@ -34,6 +35,10 @@ find apps/web/dist -type f | sort
 4. 认证完整后才允许显式设置 LIFE_OS_PRIVATE_BUILD=I_HAVE_PROTECTED_THE_SITE。
 5. 永远不要在未认证的 GitHub Pages 上发布私人日记。
 6. 照片使用受控存储；不要将真实私人图片放进 Astro public/。
+
+## 本机 Caddy / Tailscale
+
+参见 [私有部署操作文档](PRIVATE-DEPLOY.md)。Caddy 绑定 127.0.0.1:8088 并对所有文件强制密码认证；Tailscale Serve 提供 tailnet HTTPS，不能使用 Funnel 把私密照片公开分享。未经实机验证认证与 ACL，不应上传含私人内容的 dist。
 
 ## 自动化
 

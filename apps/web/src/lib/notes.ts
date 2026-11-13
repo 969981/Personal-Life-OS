@@ -35,5 +35,6 @@ export const sections = [
   { key: 'moment', label: '碎碎念', href: '/moments', icon: '💭' },
   { key: 'idea', label: '灵感', href: '/ideas', icon: '💡' },
   { key: 'knowledge', label: '知识库', href: '/knowledge', icon: '📚' },
+  { key: 'photo', label: '相册', href: '/photos', icon: '📷' },
   { key: 'project', label: '项目', href: '/projects', icon: '🛠️' },
 ] as const;

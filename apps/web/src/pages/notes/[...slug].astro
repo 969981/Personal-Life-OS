@@ -24,6 +24,7 @@ const back = sectionPath[note.data.type] ?? '/';
       </div>
       {note.data.tags.length > 0 && <div class="tags" style="margin-top:15px">{note.data.tags.map((tag) => <span>#{tag}</span>)}</div>}
     </header>
+    {note.data.type === 'photo' && note.data.photo_file && <div class="article-photo"><img src={'/_gallery/'+note.data.photo_file} alt={note.data.title} loading="eager" /></div>}
     <div class="article-body"><Content /></div>
   </article>
 </BaseLayout>

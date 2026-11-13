@@ -26,3 +26,11 @@ vault-private/
 vault/.trash/
 vault/.obsidian/workspace*.json
 vault/.obsidian/plugins/
+
+# Local-only photo metadata and original image-derived media
+vault/Photos/
+vault/Photo-Media/
+apps/web/public/_gallery/
+# Never accidentally publish local authorization information
+deploy/.private.env
+deploy/secrets.env
