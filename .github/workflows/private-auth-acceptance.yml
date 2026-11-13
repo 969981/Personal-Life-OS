@@ -1,0 +1,61 @@
+name: Private Caddy Authentication (synthetic only)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  caddy-local-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LIFE_OS_PRIVATE_BUILD: ""
+      LIFE_OS_SHOW_PRIVATE: "false"
+      LIFE_OS_TEST_USER: "ci-demo"
+      LIFE_OS_TEST_PASSWORD: "synthetic-ci-only-password"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Test PC/mobile marker handshake locally
+        run: node --test scripts/sync-probe.test.mjs
+      - name: Build public demo site ONLY
+        run: |
+          npm install --prefix apps/web --no-audit --no-fund
+          npm run build
+      - name: Create synthetic, ignored Caddy credential file
+        shell: bash
+        run: |
+          set -euo pipefail
+          hash="$(docker run --rm caddy:2.10 caddy hash-password --plaintext "$LIFE_OS_TEST_PASSWORD")"
+          printf 'LIFE_OS_BASIC_USER=%s\nLIFE_OS_BASIC_HASH='\''%s'\''\n' "$LIFE_OS_TEST_USER" "$hash" > deploy/.private.env
+          git check-ignore -q deploy/.private.env
+          node scripts/private-preflight.mjs
+      - name: Start Caddy on loopback only
+        run: |
+          docker compose -f deploy/compose.private.yml up -d
+          for i in {1..30}; do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:8088/; then break; fi
+            sleep 1
+          done
+        shell: bash
+      - name: Assert every route requires authentication
+        run: node scripts/check-auth.mjs
+      - name: Check port exposure and config
+        shell: bash
+        run: |
+          published="$(docker compose -f deploy/compose.private.yml port life-os-private 80)"
+          if [[ "$published" != "127.0.0.1:8088" ]]; then
+            echo 'ERROR: Docker published port is not loopback-only'
+            exit 1
+          fi
+          echo "Loopback-only Docker port verified."
+      - name: Stop synthetic Caddy instance
+        if: always()
+        run: docker compose -f deploy/compose.private.yml down --remove-orphans || true

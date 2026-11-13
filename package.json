@@ -15,6 +15,10 @@
     "memos:import": "node scripts/import-memos.mjs",
     "test:photos": "node --test apps/web/scripts/*.test.mjs",
     "ai:multi": "node scripts/ai-organize-multi.mjs",
-    "test:knowledge": "node --test apps/web/src/lib/*.test.mjs"
+    "test:knowledge": "node --test apps/web/src/lib/*.test.mjs",
+    "sync:probe": "node scripts/sync-probe.mjs",
+    "private:preflight": "node scripts/private-preflight.mjs",
+    "private:check-auth": "node scripts/check-auth.mjs",
+    "private:build": "node scripts/build-private.mjs"
   }
 }
