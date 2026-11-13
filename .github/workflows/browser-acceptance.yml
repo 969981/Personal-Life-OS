@@ -1,0 +1,34 @@
+name: Mobile Browser Acceptance (emulated)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      LIFE_OS_SHOW_PRIVATE: "false"
+      LIFE_OS_PRIVATE_BUILD: ""
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install --prefix apps/web --no-audit --no-fund
+      - name: Install Chromium
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+      - name: Build public-only demo site
+        run: npm run build
+      - name: Chromium mobile-size browser tests
+        working-directory: apps/web
+        run: npm run test:e2e

@@ -7,9 +7,19 @@ function rewriteText(value){
     if(match.index>cursor)output.push({type:'text',value:value.slice(cursor,match.index)});
     const ref=wikiReferences(match[0])[0];
     if(!ref)output.push({type:'text',value:match[0]});
-    else output.push({type:'link',url:wikiTargetHref(ref.target,ref.heading),
-      title:ref.embed?'笔记引用（打开目标）':null,
-      children:[{type:'text',value:(ref.embed?'↳ ':'')+ref.label}]});
+    else if(ref.embed) {
+      // Sandbox transclusions: only visible notes receive /embed routes at build time.
+      // No raw source filenames or unsanitized HTML are interpolated.
+      const target=normalizeTarget(ref.target);
+      const slug=target.split('/').map(encodeURIComponent).join('/');
+      const destination='/embed/'+slug;
+      const fullLink=wikiTargetHref(ref.target,ref.heading);
+      output.push({type:'html',value:
+        '<span class="life-embed"><iframe class="life-embed-frame" sandbox="" referrerpolicy="no-referrer" loading="lazy" title="笔记内容预览" src="'+destination+'"></iframe>'+
+        '<a class="life-embed-open" href="'+fullLink+'">打开完整笔记 ↗</a></span>'
+      });
+    } else output.push({type:'link',url:wikiTargetHref(ref.target,ref.heading),
+      title:null,children:[{type:'text',value:ref.label}]});
     cursor=match.index+match[0].length;
   }
   if(cursor<value.length)output.push({type:'text',value:value.slice(cursor)});

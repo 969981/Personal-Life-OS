@@ -206,3 +206,7 @@ h1,h2,h3,p { margin-top:0; }
 .capture-note{font-size:12px;color:var(--muted);margin-top:18px;line-height:1.8;}
 .capture-status{min-height:20px;margin-top:12px;color:var(--teal);}
 @media(max-width:720px){.capture-form{padding:17px;}}
+
+.life-embed { display:block; margin:18px 0; padding:12px; background:#14273b; border:1px solid #315365; border-radius:14px; max-width:100%; }
+.life-embed-frame { width:100%; min-height:280px; height:340px; border:0; border-radius:9px; display:block; background:#101a2a; }
+.life-embed-open { display:inline-block; margin:10px 4px 2px; font-size:12px; color:#90e8d2; font-weight:700; }

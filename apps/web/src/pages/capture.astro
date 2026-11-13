@@ -31,8 +31,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </form>
   <div class="mini-panel" style="max-width:750px;margin-top:20px">
     <h2 class="panel-heading">手机桌面快捷入口</h2>
-    <p class="page-description" style="margin:0">在 Safari 使用“分享 → 添加到主屏幕”，或在 Android Chrome 选择“添加到主屏幕”。之后点开 Life OS → 快捷记录。网页需要联网打开，但内容不会由网站存储；同步取决于你自己在 Obsidian 中配置的方式。</p>
+    <p class="page-description" style="margin:0">在 Safari 使用“分享 → 添加到主屏幕”，或在 Android Chrome 选择“添加到主屏幕”。之后点开 Life OS → 快捷记录。首次访问需联网并成功加载离线空白记录页；之后 /capture 可以在断网时打开精简版表单。离线页面不会缓存原始笔记或照片；保存仍由手机 Obsidian 完成。</p>
   </div>
+  <script is:inline>
+    // Scope is strictly /capture/; no personal note pages can be intercepted or cached.
+    if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')) {
+      navigator.serviceWorker.register('/capture/sw.js',{scope:'/capture/'}).catch(()=>{});
+    }
+  </script>
   <script>
     const form=document.querySelector<HTMLFormElement>('#capture-form');
     const vault=document.querySelector<HTMLInputElement>('#vault-name');

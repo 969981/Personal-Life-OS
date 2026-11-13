@@ -50,3 +50,9 @@
 - Note transclusions are navigable references; never embed hidden note HTML through an unverified include.
 - The static /capture page must never submit raw content to a web API, service worker, query parameter or analytics; only a direct user interaction may open official Obsidian URI.
 - AI multi extraction must require exact quoted source evidence and manual human approval.
+
+## v0.4 acceptance safety
+- Offline capture's service worker must be scoped to /capture/, and may cache ONLY a blank offline shell. Do not cache note HTML, content collections, API responses, or gallery assets.
+- Windows CI exercises CLI concurrent writes but cannot replace actual Obsidian QuickAdd GUI testing.
+- Wiki heading routes must preserve the URL fragment across static redirects and use Astro-generated slug IDs rather than guessing Markdown heading syntax.
+- Long chat extraction must remain bounded, local-only, quoted-evidence checked, and require approval; source immutable.

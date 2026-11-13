@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/><meta name="theme-color" content="#0c1523"/>
+<title>离线随手记录 · Life OS</title>
+<style>
+:root{color-scheme:dark;font:15px/1.6 system-ui,-apple-system,"Microsoft YaHei",sans-serif;color:#f1f6fc;background:#090e18}
+*{box-sizing:border-box}body{margin:0;padding:20px 14px 56px}
+main{max-width:720px;margin:32px auto}h1{font-size:clamp(27px,6vw,40px);letter-spacing:-1px;margin:0 0 8px}
+.subtitle{color:#9bb0c6;margin-bottom:27px}
+.card{border:1px solid #284255;border-radius:20px;background:#101c2c;padding:24px}
+label{display:block;font-weight:600;margin-bottom:7px}
+.field{margin-bottom:19px}
+textarea,select,input{color:inherit;font:inherit;border:1px solid #375064;border-radius:10px;background:#101725;width:100%;padding:12px 14px}
+textarea{min-height:170px;resize:vertical}textarea:focus,select:focus,input:focus{outline:2px solid #7ee5d6;outline-offset:2px}
+.actions{display:flex;flex-wrap:wrap;gap:10px}button{cursor:pointer;border:1px solid #36536a;background:#203345;color:#e9f8fc;border-radius:9px;padding:12px 17px}
+.primary{background:#99eddb;color:#112936;border-color:#99eddb;font-weight:700}
+.help{font-size:12px;color:#9dafc2;line-height:1.9}#status{min-height:24px;color:#8ae8d6;margin:14px 0}
+.tag{display:inline-block;color:#99efdd;font-size:11px;letter-spacing:2px;font-weight:700;margin-bottom:10px}
+a{color:#94e9d7}
+</style></head><body>
+<main>
+<span class="tag">PERSONAL LIFE OS · OFFLINE CAPTURE</span>
+<h1>没有网络，也能记下想法。</h1>
+<p class="subtitle">此页面仅缓存了空白记录表单。记录正文不会保存到网页缓存，点击后由本机 Obsidian 接收。</p>
+<form class="card" id="capture-form">
+<div class="field"><label for="capture-type">类型</label><select id="capture-type">
+<option value="moment">💭 碎碎念 → 当日日记</option>
+<option value="diary">📝 日记片段 → 当日日记</option>
+<option value="idea">💡 灵感 → 独立 Markdown</option>
+</select></div>
+<div class="field"><label for="capture-text">此刻想到的内容</label>
+<textarea id="capture-text" placeholder="一句话也可以。" required maxlength="2500"></textarea></div>
+<div class="field"><label for="vault-name">Obsidian Vault 名称或 ID</label>
+<input id="vault-name" placeholder="例如 vault" autocomplete="off" maxlength="120" required/></div>
+<div class="actions">
+<button type="submit" class="primary">写入 Obsidian</button>
+<button type="button" id="capture-copy">复制 Markdown</button>
+</div>
+<p role="status" aria-live="polite" id="status"></p>
+<p class="help">需要当前设备已安装 Obsidian、启用 Daily Notes 并打开对应 Vault。请切换到 Obsidian 检查结果；浏览器不能确认外部 App 是否真正写入。此离线页不调用网络 API，不使用草稿缓存。若手机没有 Obsidian，请复制后手动保存。</p>
+</form>
+<p class="help">联网后可以打开 <a href="/capture/">完整版快捷记录</a>。</p>
+</main>
+<script>
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const form=$('capture-form'),body=$('capture-text'),vault=$('vault-name'),type=$('capture-type'),status=$('status');
+  const name=localStorage.getItem('life-os-vault-name');
+  if(name)vault.value=name;
+  const pad=n=>String(n).padStart(2,'0');
+  function payload(){
+    const text=body.value.trim();
+    if(!text)throw Error('请先输入内容。');
+    const now=new Date(),date=[now.getFullYear(),pad(now.getMonth()+1),pad(now.getDate())].join('-');
+    const clock=pad(now.getHours())+':'+pad(now.getMinutes());
+    if(type.value==='idea'){
+      const title=text.split('\n')[0].slice(0,65);
+      const content=['---','title: '+JSON.stringify(title),'type: idea',
+        'created: '+JSON.stringify(date),'visibility: private',
+        'status: inbox','tags: [idea]','---','','# '+title,'',text,''].join('\n');
+      return{action:'new',content,file:'Ideas/'+date+'-'+now.getTime().toString(36)+'.md'};
+    }
+    return{action:'daily',content:'- '+clock+' '+(type.value==='diary'?'📝':'💭')+' '+text.replace(/\r?\n/g,'\n  ')};
+  }
+  form.addEventListener('submit',event=>{
+    event.preventDefault();
+    try{
+      if(!vault.value.trim())throw Error('请先填写 Vault 名称或 ID。');
+      const entry=payload(),url=new URL('obsidian://'+entry.action);
+      url.searchParams.set('vault',vault.value.trim());
+      url.searchParams.set('content',entry.content);
+      if(entry.action==='daily'){
+        url.searchParams.set('append','true');
+        url.searchParams.set('heading','Timeline');
+        url.searchParams.set('spacing','newline');
+      }else url.searchParams.set('file',entry.file);
+      localStorage.setItem('life-os-vault-name',vault.value.trim());
+      status.textContent='已请求打开 Obsidian。请在应用内确认记录是否保存。';
+      location.href=url.toString();
+    }catch(error){status.textContent=error.message||'提交失败';}
+  });
+  $('capture-copy').addEventListener('click',async()=>{
+    try{await navigator.clipboard.writeText(payload().content);status.textContent='已复制 Markdown，请手动粘贴进 Obsidian。';}
+    catch{status.textContent='复制失败，请检查权限，或手动复制输入文本。';}
+  });
+})();
+</script></body></html>

@@ -41,3 +41,15 @@
 ## 验收门槛
 
 任何真实个人资料都不得进入 Public GitHub 历史或未加身份认证的网站。发布前必须审核 Git diff、生成的 HTML、索引和静态文件。
+
+## v0.4 · 实际使用验收增强（PR #4）
+
+- [x] Windows GitHub runner 模拟多进程 CLI 日记追加，不丢条目
+- [x] 保存 Wiki 标题 fragment，使用 Astro 真正的 heading slug 跳转
+- [x] 静态版手机离线空白记录页，Service Worker 仅在 /capture/ 生效
+- [x] 本地 Ollama 长对话分段、上下文边界与跨段去重的模拟测试
+- [x] 只对可见笔记生成 iframe 内联嵌入，CSP 禁止嵌套 iframe
+- [ ] Windows Obsidian QuickAdd 图形界面连续记录实测
+- [ ] iOS/Android Obsidian URI + 断网录入实测
+- [ ] 真正运行本机大模型并评价长聊天提取质量
+- [ ] 私人 HTTPS 地址及身份验证的真实环境部署

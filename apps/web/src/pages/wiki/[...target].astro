@@ -1,4 +1,5 @@
 ---
+import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { visibleNotes, noteHref } from '../../lib/notes';
 import { wikiReferences, normalizeTarget, resolveWiki } from '../../lib/knowledge.mjs';
@@ -9,8 +10,6 @@ export async function getStaticPaths(){
     const target=normalizeTarget(ref.target);
     if(target)targets.add(target);
   }
-  // Same-vault standard Markdown links are rewritten by remark-wikilinks.
-  // Emit their destinations as static routes too, including relative paths.
   for(const note of notes){
     const folder=note.id.split('/').slice(0,-1).join('/');
     const body=note.body??'';
@@ -26,11 +25,34 @@ export async function getStaticPaths(){
 const {target}=Astro.props;
 const notes=await visibleNotes();
 const destination=resolveWiki(notes,target);
-if(destination)return Astro.redirect(noteHref(destination));
+const href=destination?noteHref(destination):'';
+const headings=destination?(await render(destination)).headings.map(h=>({text:h.text,slug:h.slug})):[];
 ---
-<BaseLayout title="未找到笔记">
-  <p class="page-eyebrow">WIKI / UNRESOLVED</p>
-  <h1 class="page-title">暂时无法打开这条笔记链接。</h1>
-  <p class="page-description">目标可能尚未创建、名称存在歧义，或不在当前网站允许展示的范围内。出于隐私保护，不会列出任何私人笔记。</p>
-  <a class="button" href="/knowledge">返回知识库</a>
+<BaseLayout title={destination?'正在打开笔记':'未找到笔记'}>
+  {destination ?
+    <section class="mini-panel" id="wiki-redirect" data-destination={href} data-headings={JSON.stringify(headings)}>
+      <p class="page-eyebrow">WIKI / OPENING</p>
+      <h1 class="page-title">正在打开「{destination.data.title}」</h1>
+      <p class="page-description">如果没有自动跳转，请点击下面的链接。</p>
+      <a href={href} class="button primary">打开笔记 ↗</a>
+    </section>
+  : <section class="mini-panel">
+      <p class="page-eyebrow">WIKI / UNRESOLVED</p>
+      <h1 class="page-title">暂时无法打开这条笔记链接。</h1>
+      <p class="page-description">笔记可能尚未创建、重名，或不在当前网站允许展示的范围内。此页面不会列出私人笔记。</p>
+      <a class="button" href="/knowledge">返回知识库</a>
+    </section>}
+  <script>
+    // Static generated Wiki route: resolve the heading from Astro's actual slugs.
+    // Browser fragments are not sent to servers. Keep them across the redirect.
+    import { headingFragment } from '../../lib/heading-link.mjs';
+    const node=document.querySelector<HTMLElement>('#wiki-redirect');
+    if(node?.dataset.destination){
+      try{
+        const headings=JSON.parse(node.dataset.headings??'[]');
+        const suffix=headingFragment(location.hash,headings);
+        window.location.replace(node.dataset.destination+suffix);
+      }catch{ /* The manual link above remains usable. */ }
+    }
+  </script>
 </BaseLayout>

@@ -2,7 +2,7 @@
 
 > 日常碎碎念、Diary 日记、聊天灵感、知识库和项目，最后成为一个属于自己的 Markdown 数字生活空间。
 
-**当前状态：v0.3 每日记录与链接预览 · Astro + Obsidian · 本仓库暂时为 Public。**
+**当前状态：v0.4 验收增强版 · Astro + Obsidian · 本仓库暂时为 Public。**
 
 ⚠️ **请勿上传真实私人日记、聊天记录、照片、身份证件、账户或其他敏感数据。** 已设置 Git 忽略规则，但不是泄露保险：强制添加、已经提交的历史、工作流日志和第三方部署都可能泄露内容。详见 [隐私指南](docs/PRIVACY.md)。
 
@@ -36,7 +36,7 @@ npm run dev
 | 知识库 | /knowledge | Markdown 内容 |
 | 项目 | /projects | 项目卡片 |
 | 相册 | /photos | 私人图像导入、WebP、可见图片墙 |
-| 快捷记录 | /capture | 手机调用 Obsidian 官方 URI，零后端 |
+| 快捷记录 | /capture | 官方 Obsidian URI + 无私人缓存的离线空白表单 |
 | 搜索 | /search | 已展示笔记的标题、标签和摘要搜索 |
 | AI 整理 | CLI | 本地 Ollama 单篇/多篇候选灵感，保留原文证据，需人工审核 |
 | Memos | CLI | JSON/API 单向私有导入（可选） |
@@ -84,7 +84,8 @@ Diary 会追加到当天文件的 Timeline 标题下；chat 会保留原文并�
 - [本地 AI 整理](docs/AI-ORGANIZER.md)：Ollama 结构化提取，先进入 00-Inbox/AI-Proposals，审核后才移动到 Ideas/Knowledge/Projects；
 - [Memos 导入](docs/MEMOS.md)：可从 JSON 或授权 API 导入到 Moments，dry-run 默认开启，默认私密；
 - [私人相册](docs/PHOTOS.md)：sharp 去 EXIF、生成 WebP、生成允许发布的静态图片列表；
-- [手机快捷记录](docs/MOBILE-CAPTURE.md)：官方 Obsidian URI，将一句话追加到当日日记，主屏快捷入口；
+- [手机快捷记录](docs/MOBILE-CAPTURE.md)
+- [Windows / 手机 / Markdown / 长聊天实机验收清单](docs/ACCEPTANCE-V04.md)：官方 Obsidian URI，将一句话追加到当日日记，主屏快捷入口；
 - [带认证的私有站点](docs/PRIVATE-DEPLOY.md)：本机 Caddy 全站 Basic Auth + Tailscale Serve，未自动部署。
 
 ```bash
