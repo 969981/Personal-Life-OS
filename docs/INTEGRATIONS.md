@@ -4,8 +4,8 @@
 
 | 开源项目 | 角色 | v0.1 状态 | 后续方向 |
 | --- | --- | --- | --- |
-| Obsidian | 主要 Markdown 编辑、Daily Notes、QuickAdd、Bases | 已建 Vault 和模板 | 快捷记录、灵感看板 |
-| Memos | 可选的社交式时间线录入 | 未安装 | API 单向导出到 vault/Moments |
+| Obsidian | 主要 Markdown 编辑、Daily Notes、QuickAdd、Bases | 已建 Vault、模板和 QuickAdd 捕捉宏 | 快捷记录、灵感看板 |
+| Memos | 可选的社交式时间线录入 | 已实现 JSON/API 导入 CLI | 后续增量差异对比 |
 | Quartz | 可选数字花园引擎 / 设计参考 | 未安装 | 研究 WikiLink 与反向链接 |
 | Astro | Markdown 转私人生活网站 | 已采用 | 相册、图谱、移动端 |
 | SilverBullet | 可选浏览器/PWA Markdown 编辑器 | 未安装 | 浏览器端录入 |
