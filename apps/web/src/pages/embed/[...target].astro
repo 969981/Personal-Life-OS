@@ -1,0 +1,52 @@
+---
+import { render } from 'astro:content';
+import { visibleNotes } from '../../lib/notes';
+import { wikiReferences, normalizeTarget, resolveWiki } from '../../lib/knowledge.mjs';
+export async function getStaticPaths(){
+  // Never enumerate all private or unreferenced notes.
+  const notes=await visibleNotes();
+  const targets=new Set();
+  for(const source of notes){
+    for(const ref of wikiReferences(source.body??'')){
+      if(!ref.embed)continue;
+      const target=normalizeTarget(ref.target);
+      if(target)targets.add(target);
+    }
+  }
+  return [...targets].map(target=>({params:{target},props:{target}}));
+}
+const {target}=Astro.props;
+const notes=await visibleNotes();
+const note=resolveWiki(notes,target);
+const Rendered=note?await render(note):null;
+const Content=Rendered?.Content;
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; frame-src 'none'; script-src 'none'; connect-src 'none'; font-src 'none'; form-action 'none'; base-uri 'none'"/>
+<title>笔记嵌入预览</title>
+<style>
+  :root{color-scheme:dark;font:14px/1.8 system-ui,sans-serif;color:#e6eef7;background:#101a2a}
+  body{margin:0;padding:14px 18px;overflow-wrap:anywhere}
+  h1{font-size:18px;line-height:1.4;margin:0 0 14px}
+  h2{font-size:16px;margin:1.5em 0 .4em}h3{font-size:14px}
+  p,ul,ol,blockquote{margin:10px 0}blockquote{border-left:2px solid #74d7c6;padding-left:12px;color:#aadad0}
+  a{color:#96e5d6}pre,code{white-space:pre-wrap;overflow-wrap:anywhere}pre{background:#0c1421;padding:12px;border-radius:9px}
+  img{max-width:100%;height:auto}
+  iframe{display:none!important}
+  .missing{color:#a7b6c9}
+</style>
+</head>
+<body>
+{note&&Content ?
+  <article aria-label="被引用的笔记内容">
+    <h1>{note.data.title}</h1>
+    <div><Content /></div>
+  </article>
+  : <p class="missing">此笔记不可预览（可能不存在、重名或未授权）。</p>}
+</body>
+</html>
