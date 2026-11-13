@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { visibleNotes, sectionNotes, noteDate, dateText, noteHref } from '../lib/notes';
+const notes = await visibleNotes();
+const diary = sectionNotes(notes, 'diary');
+const ideas = sectionNotes(notes, 'idea');
+const moments = sectionNotes(notes, 'moment');
+const latest = notes.slice(0,3);
+const latestDiaries = diary.slice(0,3);
+const dateLabel = new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:'Asia/Shanghai'}).format(new Date());
+---
+<BaseLayout title="生活首页" active="home">
+  <section class="hero">
+    <span class="hero-eyebrow">YOUR PRIVATE DIGITAL GARDEN · {dateLabel}</span>
+    <h1>记录生活，也记录想法。</h1>
+    <p>一天的一句话、偶然的灵感、做过的研究，都值得有一个属于自己的地方。慢慢写，慢慢积累。</p>
+    <div class="hero-actions">
+      <a class="button primary" href="/diary">翻看日记 ↗</a>
+      <a class="button" href="/ideas">探索灵感 ✦</a>
+    </div>
+  </section>
+  <div class="stats" aria-label="笔记统计">
+    <div class="stat"><span class="stat-icon">📖</span><div><small>日记记录</small><strong>{diary.length}</strong></div></div>
+    <div class="stat"><span class="stat-icon">💡</span><div><small>灵感卡片</small><strong>{ideas.length}</strong></div></div>
+    <div class="stat"><span class="stat-icon">💭</span><div><small>碎碎念</small><strong>{moments.length}</strong></div></div>
+  </div>
+  <section>
+    <div class="section-heading"><h2>✳ 最近的记录</h2><a href="/search">查看全部 ↗</a></div>
+    {latest.length ? <div class="grid-cards">{latest.map((note) => <NoteCard note={note}/>)}</div>
+      : <div class="empty"><strong>还没有公开的记录</strong>在 Obsidian 里写下第一篇笔记，或用本地私密预览模式查看内容。</div>}
+  </section>
+  <section class="panel-grid" style="margin-top:26px">
+    <div class="mini-panel">
+      <div class="section-heading" style="margin:0 0 9px"><h2>🗓 生活时间线</h2><a href="/calendar">查看日历 ↗</a></div>
+      {latestDiaries.length ? <div class="link-list">{latestDiaries.map((note) =>
+        <a href={noteHref(note)}><span class="bullet">✳</span><span><strong>{note.data.title}</strong><small>{dateText(noteDate(note))}</small></span></a>)}</div>
+        : <p class="page-description">暂无日记记录。</p>}
+    </div>
+    <div class="mini-panel">
+      <div class="section-heading" style="margin:0 0 9px"><h2>✨ 正在发芽的灵感</h2><a href="/ideas">全部灵感 ↗</a></div>
+      {ideas.length ? <div class="link-list">{ideas.slice(0,3).map((note) =>
+        <a href={noteHref(note)}><span class="bullet">✦</span><span><strong>{note.data.title}</strong><small>{note.data.summary ?? '点击查看灵感详情'}</small></span></a>)}</div>
+        : <p class="page-description">灵感会在这里慢慢积累。</p>}
+    </div>
+  </section>
+</BaseLayout>

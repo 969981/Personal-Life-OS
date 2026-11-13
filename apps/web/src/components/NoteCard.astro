@@ -1,0 +1,23 @@
+---
+import type { Note } from '../lib/notes';
+import { dateText, noteDate, noteHref } from '../lib/notes';
+interface Props {
+  note: Note;
+  compact?: boolean;
+}
+const { note, compact = false } = Astro.props;
+const icons: Record<string,string> = { diary: '📖', moment: '💭', idea: '💡', knowledge: '📚', project: '🛠️', review: '✍️' };
+---
+<a class:list={['note-card', { compact }]} href={noteHref(note)}>
+  <div class="note-card-top">
+    <span class="note-kind"><span>{icons[note.data.type]}</span> {note.data.type}</span>
+    <time>{dateText(noteDate(note))}</time>
+  </div>
+  <h3>{note.data.title}</h3>
+  {note.data.summary && <p>{note.data.summary}</p>}
+  <div class="note-card-bottom">
+    <span class="tags">{note.data.tags.slice(0,3).map((tag) => <span>#{tag}</span>)}</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </div>
+  {note.data.demo && <span class="demo-marker">演示</span>}
+</a>
