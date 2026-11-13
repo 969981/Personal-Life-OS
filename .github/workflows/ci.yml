@@ -1,0 +1,40 @@
+name: CI (public samples only)
+
+on:
+  push:
+    branches: [main, feat/personal-life-os-foundation]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      LIFE_OS_SHOW_PRIVATE: "false"
+      LIFE_OS_PRIVATE_BUILD: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify no tracked private vault folders
+        run: |
+          if git ls-files vault | grep -E '^vault/(00-Inbox|Diary|Moments|Ideas|Knowledge|Projects|Life|Reviews|Chat-Captures|Attachments)/'; then
+            echo "ERROR: private vault folder has tracked files"
+            exit 1
+          fi
+      - name: Install
+        run: npm install --prefix apps/web --no-audit --no-fund
+      - name: Build public-only website
+        run: npm run build
+      - name: Verify generated site
+        run: |
+          test -f apps/web/dist/index.html
+          test -f apps/web/dist/diary/index.html
+          test -f apps/web/dist/calendar/index.html
+          test -f apps/web/dist/search/index.html
+          echo "Public demo build generated."

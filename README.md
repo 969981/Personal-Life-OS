@@ -1,12 +1,84 @@
 # Personal Life OS
 
-一个以 Markdown 为主数据的个人生活记录与知识管理项目：Obsidian 日记、灵感整理、Astro 网页。
+> 日常碎碎念、Diary 日记、聊天灵感、知识库和项目，最后成为一个属于自己的 Markdown 数字生活空间。
 
-> ⚠️ 仓库目前是公开的。请勿向本仓库提交真实私人日记、聊天记录、照片、账号信息或其他敏感资料。完整实现通过开发分支与 Pull Request 引入。
+**当前状态：v0.1 原型 · Astro + Obsidian · 本仓库暂时为 Public。**
 
-## 目标
+⚠️ **请勿上传真实私人日记、聊天记录、照片、身份证件、账户或其他敏感数据。** 已设置 Git 忽略规则，但不是泄露保险：强制添加、已经提交的历史、工作流日志和第三方部署都可能泄露内容。详见 [隐私指南](docs/PRIVACY.md)。
 
-- Obsidian 管理每日 Diary、随手碎碎念、灵感、知识与项目。
-- Astro 从 Markdown 构建日历、时间线、笔记、灵感与生活首页。
-- 原始记录优先、AI 整理只产生候选笔记、不自动覆盖原文。
-- 默认公开构建只包含明确公开内容。
+## 快速开始
+
+要求：Node.js 22+、npm、Obsidian（可选）。
+
+~~~bash
+git clone https://github.com/969981/Personal-Life-OS.git
+cd Personal-Life-OS
+git switch feat/personal-life-os-foundation
+npm run init:vault
+npm install --prefix apps/web
+npm run dev
+~~~
+
+打开 http://127.0.0.1:4321。
+
+在 Obsidian 选择 Open folder as vault，打开仓库里的 vault/ 目录。打开 Daily Notes / Templates 核心插件；建议按需安装 QuickAdd 和 Obsidian Git。
+
+当前默认网页只显示 visibility: public 的演示笔记。在可信任的本机 dev 模式下设置 LIFE_OS_SHOW_PRIVATE=true 可查看私人笔记；普通 build 不会公开私人数据。
+
+## 功能
+
+| 模块 | 路由 | 当前状态 |
+| --- | --- | --- |
+| 生活首页 | / | Dashboard、统计、最新记录 |
+| Diary 日记 | /diary | Markdown 列表与阅读 |
+| 碎碎念 | /moments | 时间线 |
+| 日历 | /calendar | 月份切换、日期跳转 |
+| 灵感 | /ideas | 卡片与状态 |
+| 知识库 | /knowledge | Markdown 内容 |
+| 项目 | /projects | 项目卡片 |
+| 相册 | /photos | 安全占位，暂不上传私人照片 |
+| 搜索 | /search | 已展示笔记的标题、标签和摘要搜索 |
+| AI 自动整理 | — | 设计中，尚未启用 |
+| Memos / Quartz / SilverBullet | — | 可选集成，不引入第二套主数据 |
+
+## 目录
+
+- vault/Samples/：公开演示笔记，供预览与 CI 使用
+- vault/Templates/：Obsidian 日记、灵感和聊天摘录模板
+- vault/Diary/、vault/Ideas/、vault/Chat-Captures/ 等：真实个人笔记，默认被 Git 忽略
+- apps/web/：Astro 网站
+- docs/：架构、隐私、集成与迭代计划
+- scripts/：初始化及后续整理工具
+
+每篇笔记使用 YAML frontmatter；visibility 缺失时默认为 private。
+
+~~~yaml
+---
+title: "今天的一点记录"
+type: diary
+date: "2026-11-13"
+visibility: private
+tags: [daily, life]
+---
+~~~
+
+**数据原则：** Markdown 是主数据；Obsidian 是编辑器，Astro 是只读展示，Git 是版本历史。AI 仅生成候选内容，默认不能修改原始记录。
+
+## 构建
+
+~~~bash
+npm run build
+npm run preview
+~~~
+
+静态产物位于 apps/web/dist/。**本仓库 Actions 只执行 CI 检查，不自动发布网站。** 私人网站必须在完成身份访问保护和预览域名检查后才部署。
+
+## 文档
+
+- [技术架构](docs/ARCHITECTURE.md)
+- [隐私与公开仓库防护](docs/PRIVACY.md)
+- [开源项目融合方案](docs/INTEGRATIONS.md)
+- [开发路线](docs/ROADMAP.md)
+- [AI 协作规则](AGENTS.md)
+
+License：尚未决定，当前不应假定获得复用授权。
