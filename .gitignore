@@ -1,0 +1,28 @@
+# Dependencies / builds
+node_modules/
+apps/web/node_modules/
+apps/web/.astro/
+apps/web/dist/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+
+# PRIVACY: actual personal vault content must not enter this PUBLIC repo.
+# Only vault/Samples and vault/Templates are intentionally committed.
+vault/00-Inbox/
+vault/Diary/
+vault/Moments/
+vault/Ideas/
+vault/Knowledge/
+vault/Projects/
+vault/Life/
+vault/Reviews/
+vault/Chat-Captures/
+vault/Attachments/
+vault-private/
+vault/.trash/
+vault/.obsidian/workspace*.json
+vault/.obsidian/plugins/

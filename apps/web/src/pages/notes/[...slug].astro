@@ -1,0 +1,29 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { visibleNotes, dateText, noteDate } from '../../lib/notes';
+export async function getStaticPaths() {
+  const notes = await visibleNotes();
+  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+const { note } = Astro.props as { note: CollectionEntry<'notes'> };
+const { Content } = await render(note);
+const sectionPath: Record<string,string> = { diary:'/diary', moment:'/moments', idea:'/ideas', knowledge:'/knowledge', project:'/projects', review:'/' };
+const back = sectionPath[note.data.type] ?? '/';
+---
+<BaseLayout title={note.data.title}>
+  <article class="note-article">
+    <a href={back} class="article-back">← 返回{note.data.type === 'diary' ? '日记' : '列表'}</a>
+    <header class="article-heading">
+      <p class="page-eyebrow">{note.data.type.toUpperCase()} / PERSONAL ARCHIVE</p>
+      <h1>{note.data.title}</h1>
+      <div class="article-meta">
+        <span>◷ {dateText(noteDate(note))}</span>
+        {note.data.status && <span>状态：{note.data.status}</span>}
+        {note.data.demo && <span>✳ 这是一份演示笔记</span>}
+      </div>
+      {note.data.tags.length > 0 && <div class="tags" style="margin-top:15px">{note.data.tags.map((tag) => <span>#{tag}</span>)}</div>}
+    </header>
+    <div class="article-body"><Content /></div>
+  </article>
+</BaseLayout>

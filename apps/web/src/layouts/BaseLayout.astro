@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+import { mayShowPrivate } from '../lib/notes';
+interface Props {
+  title: string;
+  description?: string;
+  active?: string;
+}
+const { title, description = '把每天的点滴整理成自己的数字生活空间。', active = '' } = Astro.props;
+const privatePreview = mayShowPrivate();
+const navigation = [
+  { label: '生活首页', icon: '⌂', href: '/', key: 'home' },
+  { label: '日记', icon: '▤', href: '/diary', key: 'diary' },
+  { label: '碎碎念', icon: '◌', href: '/moments', key: 'moments' },
+  { label: '日历', icon: '▦', href: '/calendar', key: 'calendar' },
+  { label: '灵感', icon: '✦', href: '/ideas', key: 'ideas' },
+  { label: '知识库', icon: '◇', href: '/knowledge', key: 'knowledge' },
+  { label: '项目', icon: '▣', href: '/projects', key: 'projects' },
+  { label: '相册', icon: '▧', href: '/photos', key: 'photos' },
+  { label: '搜索', icon: '⌕', href: '/search', key: 'search' },
+];
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content={description}/>
+    <meta name="robots" content="noindex, nofollow"/>
+    <meta name="color-scheme" content="dark"/>
+    <title>{title} · Personal Life OS</title>
+  </head>
+  <body>
+    <div class="site-shell">
+      <aside class="sidebar" aria-label="主导航">
+        <a class="brand" href="/" aria-label="回到首页">
+          <span class="brand-symbol">✳</span>
+          <span><strong>Life OS</strong><small>Personal Space / 私人空间</small></span>
+        </a>
+        <div class="nav-heading">我的空间 <span>01</span></div>
+        <nav class="side-nav" aria-label="页面">
+          {navigation.map((item) => <a href={item.href} class:list={['side-link', { selected: active === item.key }]} aria-current={active === item.key ? 'page' : undefined}>
+            <span class="side-icon">{item.icon}</span><span>{item.label}</span>
+          </a>)}
+        </nav>
+        <div class="side-footer">
+          <div class="tiny-orbit">☼</div>
+          <strong>写下生活，留住灵感。</strong>
+          <p>所有内容都由 Markdown 驱动。</p>
+          <span class="side-version">Personal Life OS · v0.1</span>
+        </div>
+      </aside>
+      <div class="main-area">
+        <header class="topbar">
+          <a class="mobile-brand" href="/"><span>✳</span> Life OS</a>
+          <div class="breadcrumb">PERSONAL <span>/</span> {title}</div>
+          <div class="top-actions">
+            {privatePreview && <span class="privacy-tag private">本地私密预览</span>}
+            {!privatePreview && <span class="privacy-tag">公开演示数据</span>}
+            <a class="top-search" href="/search" aria-label="搜索笔记">⌕</a>
+            <span class="avatar" aria-label="个人主页">L</span>
+          </div>
+        </header>
+        <main class="page-container" id="main"><slot /></main>
+        <footer class="footer-line">MADE FOR SLOW LIVING <span>✳</span> MARKDOWN FOREVER</footer>
+      </div>
+    </div>
+    <nav class="mobile-nav" aria-label="移动导航">
+      {navigation.filter((item) => ['home','diary','moments','ideas','search'].includes(item.key)).map((item) =>
+        <a href={item.href} class:list={[{ selected: active === item.key }]}><span>{item.icon}</span>{item.label}</a>
+      )}
+    </nav>
+  </body>
+</html>

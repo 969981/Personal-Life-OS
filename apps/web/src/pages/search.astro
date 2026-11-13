@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { visibleNotes } from '../lib/notes';
+const notes = await visibleNotes();
+---
+<BaseLayout title="搜索" active="search">
+  <p class="page-eyebrow">SEARCH YOUR WORLD / DISCOVER</p>
+  <h1 class="page-title">找到曾经的一个念头。</h1>
+  <p class="page-description">搜索已展示的笔记标题、摘要和标签。默认仅对允许公开的内容建立页面搜索，不会将私人笔记传到第三方搜索引擎。</p>
+  <label for="note-search" class="page-eyebrow" style="display:block;letter-spacing:1px">搜索笔记</label>
+  <input id="note-search" class="search-input" type="search" autocomplete="off" placeholder="试试：Markdown、日记、灵感…" />
+  <p class="search-count" id="search-count">共 {notes.length} 篇可查看的笔记</p>
+  <div class="page-card-list" id="search-results">
+    {notes.map((note) => <div data-search-item data-search-text={[note.data.title,note.data.summary??'',...note.data.tags].join(' ').toLocaleLowerCase('zh-CN')}><NoteCard note={note}/></div>)}
+  </div>
+  <div id="search-empty" class="empty" hidden><strong>没有找到匹配的记录</strong>尝试更短的关键词，或者换个标签。</div>
+  <script>
+    const input = document.querySelector<HTMLInputElement>('#note-search');
+    const items = Array.from(document.querySelectorAll<HTMLElement>('[data-search-item]'));
+    const count = document.querySelector<HTMLElement>('#search-count');
+    const empty = document.querySelector<HTMLElement>('#search-empty');
+    input?.addEventListener('input', () => {
+      const query = input.value.trim().toLocaleLowerCase('zh-CN');
+      let visible = 0;
+      items.forEach((item) => {
+        const hit = (item.dataset.searchText ?? '').includes(query);
+        item.hidden = !hit;
+        if (hit) visible++;
+      });
+      if (count) count.textContent = '找到 ' + visible + ' 篇笔记';
+      if (empty) empty.hidden = visible !== 0;
+    });
+  </script>
+</BaseLayout>
